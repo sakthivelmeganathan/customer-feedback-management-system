@@ -5,205 +5,212 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Submit Feedback</title>
     <style>
+        * { box-sizing: border-box; }
         body { 
             font-family: Arial, sans-serif; 
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80') center/cover no-repeat fixed;
-            margin: 0; 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2084&q=80') center/cover no-repeat fixed;
+            margin: 0;
             min-height: 100vh;
-            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
         }
-        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-        .card { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
-        .header { text-align: center; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-weight: 600; color: #374151; margin-bottom: 8px; }
-        .form-control { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.3s ease; }
-        .form-control:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
-        .form-select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e"); background-position: right 12px center; background-repeat: no-repeat; background-size: 16px; padding-right: 40px; }
-        textarea.form-control { resize: vertical; min-height: 120px; }
-        .rating-group { display: flex; gap: 10px; align-items: center; }
-        .rating-input { display: none; }
-        .rating-label { font-size: 24px; color: #d1d5db; cursor: pointer; transition: color 0.2s ease; }
-        .rating-input:checked ~ .rating-label, .rating-label:hover { color: #fbbf24; }
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
-        .btn-outline { background: transparent; color: #667eea; border: 2px solid #667eea; }
-        .btn-outline:hover { background: #667eea; color: white; }
-        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; }
-        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: #fff; padding: 15px 20px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .form-card { 
+            width: 100%; 
+            max-width: 600px; 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 15px; 
+            padding: 40px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            backdrop-filter: blur(10px);
+        }
+        h2 { margin: 0 0 10px 0; font-size: 28px; text-align: center; color: #333; font-weight: 600; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        label { display: block; margin-top: 20px; font-size: 14px; color: #555; font-weight: 500; }
+        input[type="text"], select, textarea { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 8px; 
+            margin-top: 8px; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #11998e;
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+        }
+        textarea { resize: vertical; min-height: 120px; }
+        .rating-container { margin-top: 20px; }
+        .stars { display: flex; gap: 5px; margin-top: 10px; }
+        .star { 
+            font-size: 24px; 
+            color: #ddd; 
+            cursor: pointer; 
+            transition: color 0.2s ease;
+        }
+        .star:hover, .star.active { color: #fbbf24; }
+        .rating-text { margin-top: 10px; color: #666; font-size: 14px; }
+        button { 
+            margin-top: 30px; 
+            width: 100%; 
+            padding: 16px; 
+            border: 0; 
+            border-radius: 8px; 
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); 
+            color: #fff; 
+            cursor: pointer; 
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+        .back-link { 
+            display: inline-block; 
+            margin-top: 20px; 
+            color: #11998e; 
+            text-decoration: none; 
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+        }
+        .back-link:hover { text-decoration: underline; }
     </style>
+    <link rel="icon" href="data:,">
 </head>
 <body>
+    <div class="header">
+        <h1>📝 Submit Your Feedback</h1>
+        <p style="margin: 5px 0; opacity: 0.9;">Help us improve by sharing your experience</p>
+    </div>
+
     <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>📝 Submit Your Feedback</h1>
-                <p style="color: #6b7280; margin: 10px 0 0 0;">Help us improve by sharing your experience</p>
-            </div>
+        <div class="form-card">
+            <form onsubmit="return submitFeedback(event)">
+                <label>Feedback Title
+                    <input type="text" id="title" name="title" placeholder="Brief title for your feedback" required>
+                </label>
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <form method="post">
-                <div class="form-group">
-                    <label class="form-label" for="title">Feedback Title</label>
-                    <input type="text" id="title" name="title" class="form-control" placeholder="Brief title for your feedback" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="category">Category</label>
-                    <select id="category" name="category" class="form-control form-select" required>
+                <label>Category
+                    <select id="category" name="category" required>
                         <option value="">Select a category</option>
-                        {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.name }} - {{ category.description }}</option>
-                        {% endfor %}
+                        <option value="Product">Product</option>
+                        <option value="Service">Service</option>
+                        <option value="Website">Website</option>
+                        <option value="Support">Support</option>
+                        <option value="Other">Other</option>
                     </select>
-                </div>
+                </label>
 
-                <div class="form-group">
-                    <label class="form-label">Rating</label>
-                    <div class="rating-group">
-                        {% for i in range(1, 6) %}
-                            <input type="radio" id="rating{{ i }}" name="rating" value="{{ i }}" class="rating-input" required>
-                            <label for="rating{{ i }}" class="rating-label">★</label>
-                        {% endfor %}
-                        <span style="margin-left: 10px; color: #6b7280; font-size: 14px;">Click to rate</span>
+                <div class="rating-container">
+                    <label>Rating</label>
+                    <div class="stars" id="starRating">
+                        <span class="star" data-rating="1">★</span>
+                        <span class="star" data-rating="2">★</span>
+                        <span class="star" data-rating="3">★</span>
+                        <span class="star" data-rating="4">★</span>
+                        <span class="star" data-rating="5">★</span>
                     </div>
+                    <div class="rating-text" id="ratingText">Click to rate</div>
+                    <input type="hidden" id="rating" name="rating" required>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="content">Your Feedback</label>
-                    <textarea id="content" name="content" class="form-control" placeholder="Please share your detailed feedback here..." required minlength="10"></textarea>
-                    <small style="color: #6b7280; font-size: 12px;">Minimum 10 characters required</small>
-                </div>
+                <label>Your Feedback
+                    <textarea id="content" name="content" placeholder="Share your detailed feedback here..." required></textarea>
+                </label>
 
-                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
-                    <button type="submit" class="btn btn-primary">✨ Submit Feedback</button>
-                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">💾 Save Draft</button>
-                    <a href="/dashboard" class="btn btn-outline">← Back to Dashboard</a>
-                </div>
-                
-                <!-- Quick Templates -->
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                    <h3 style="margin-bottom: 15px; color: #374151;">📝 Quick Templates</h3>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="useTemplate('bug')">🐛 Bug Report</button>
-                        <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="useTemplate('feature')">✨ Feature Request</button>
-                        <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="useTemplate('compliment')">👏 Compliment</button>
-                        <button type="button" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" onclick="useTemplate('complaint')">😞 Complaint</button>
-                    </div>
-                </div>
+                <button type="submit">🚀 Submit Feedback</button>
             </form>
+            
+            <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
         </div>
     </div>
 
     <script>
-        // Rating interaction
-        const ratingInputs = document.querySelectorAll('.rating-input');
-        const ratingLabels = document.querySelectorAll('.rating-label');
+        let selectedRating = 0;
 
-        ratingLabels.forEach((label, index) => {
-            label.addEventListener('mouseover', () => {
-                ratingLabels.forEach((l, i) => {
-                    l.style.color = i <= index ? '#fbbf24' : '#d1d5db';
-                });
+        // Star rating functionality
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function() {
+                selectedRating = parseInt(this.dataset.rating);
+                document.getElementById('rating').value = selectedRating;
+                updateStars();
+                updateRatingText();
             });
 
-            label.addEventListener('mouseout', () => {
-                const checkedIndex = Array.from(ratingInputs).findIndex(input => input.checked);
-                ratingLabels.forEach((l, i) => {
-                    l.style.color = i <= checkedIndex ? '#fbbf24' : '#d1d5db';
-                });
-            });
-
-            label.addEventListener('click', () => {
-                ratingInputs[index].checked = true;
-                ratingLabels.forEach((l, i) => {
-                    l.style.color = i <= index ? '#fbbf24' : '#d1d5db';
-                });
+            star.addEventListener('mouseover', function() {
+                const hoverRating = parseInt(this.dataset.rating);
+                highlightStars(hoverRating);
             });
         });
 
-        // Form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const content = document.getElementById('content').value;
-            if (content.length < 10) {
-                e.preventDefault();
-                alert('Please provide at least 10 characters in your feedback.');
-                return;
-            }
-
-            const submitBtn = document.querySelector('button[type="submit"]');
-            submitBtn.innerHTML = '⏳ Submitting...';
-            submitBtn.disabled = true;
+        document.getElementById('starRating').addEventListener('mouseleave', function() {
+            updateStars();
         });
 
-        // Character counter
-        const contentTextarea = document.getElementById('content');
-        const charCounter = document.createElement('div');
-        charCounter.style.cssText = 'text-align: right; font-size: 12px; color: #6b7280; margin-top: 5px;';
-        contentTextarea.parentNode.appendChild(charCounter);
-
-        contentTextarea.addEventListener('input', function() {
-            const length = this.value.length;
-            charCounter.textContent = `${length} characters`;
-            charCounter.style.color = length < 10 ? '#ef4444' : '#6b7280';
-            
-            clearTimeout(window.draftTimeout);
-            window.draftTimeout = setTimeout(saveDraft, 2000);
-        });
-
-        // Template functions
-        function useTemplate(type) {
-            const templates = {
-                bug: {
-                    title: 'Bug Report: [Brief Description]',
-                    content: 'I encountered an issue with [specific feature/page].\n\nSteps to reproduce:\n1. \n2. \n3. \n\nExpected behavior: \nActual behavior: \n\nBrowser/Device: '
-                },
-                feature: {
-                    title: 'Feature Request: [Feature Name]',
-                    content: 'I would like to suggest a new feature: [feature description]\n\nWhy this would be useful:\n\nHow it should work:\n\nAdditional notes:'
-                },
-                compliment: {
-                    title: 'Great Experience with [Service/Product]',
-                    content: 'I wanted to share my positive experience with [specific service/product].\n\nWhat I loved:\n\nWhy it exceeded my expectations:\n\nThank you for the excellent service!'
-                },
-                complaint: {
-                    title: 'Issue with [Service/Product]',
-                    content: 'I experienced an issue with [specific service/product].\n\nWhat happened:\n\nHow it affected me:\n\nWhat I expected:\n\nSuggested resolution:'
+        function highlightStars(rating) {
+            document.querySelectorAll('.star').forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
                 }
-            };
-            
-            const template = templates[type];
-            if (template) {
-                document.getElementById('title').value = template.title;
-                document.getElementById('content').value = template.content;
-            }
+            });
         }
 
-        function saveDraft() {
-            const formData = {
-                title: document.getElementById('title').value,
-                category: document.getElementById('category').value,
-                content: document.getElementById('content').value
+        function updateStars() {
+            highlightStars(selectedRating);
+        }
+
+        function updateRatingText() {
+            const texts = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            document.getElementById('ratingText').textContent = texts[selectedRating] || 'Click to rate';
+        }
+
+        function submitFeedback(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const category = document.getElementById('category').value;
+            const rating = document.getElementById('rating').value;
+            const content = document.getElementById('content').value;
+            
+            if (!rating) {
+                alert('Please select a rating');
+                return false;
+            }
+            
+            // Store feedback (in real app, this would go to database)
+            const username = localStorage.getItem('currentUser') || 'User';
+            const feedback = {
+                title: title,
+                category: category,
+                rating: parseInt(rating),
+                content: content,
+                status: 'pending',
+                date: new Date().toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                }),
+                user: username
             };
             
-            localStorage.setItem('feedbackDraft', JSON.stringify(formData));
+            // Store in localStorage (demo purposes)
+            const existingFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
+            existingFeedback.push(feedback);
+            localStorage.setItem('userFeedback', JSON.stringify(existingFeedback));
             
-            const indicator = document.createElement('div');
-            indicator.textContent = '💾 Draft saved';
-            indicator.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 10px 15px; border-radius: 6px; z-index: 1000;';
-            document.body.appendChild(indicator);
-            setTimeout(() => indicator.remove(), 2000);
+            alert('Thank you! Your feedback has been submitted successfully.');
+            window.location.href = 'dashboard.html';
+            
+            return false;
         }
     </script>
 </body>
