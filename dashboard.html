@@ -171,43 +171,68 @@
             const username = localStorage.getItem('currentUser') || 'User';
             document.getElementById('username').textContent = username;
             
-            // Load user-specific data
-            const user = userData[username] || userData['john_doe']; // Default fallback
+            // Load user-specific feedback from localStorage
+            const userFeedbackKey = 'feedback_' + username;
+            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
             
-            // Update stats
-            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = user.stats.total;
-            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = user.stats.resolved;
-            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = user.stats.pending;
-            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = user.stats.avgRating;
+            // Calculate stats from actual user feedback
+            const stats = {
+                total: userFeedback.length,
+                resolved: userFeedback.filter(f => f.status === 'resolved').length,
+                pending: userFeedback.filter(f => f.status === 'pending').length,
+                avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
+            };
             
-            // Update feedback table
+            // Update stats display
+            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = stats.total;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stats.resolved;
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stats.pending;
+            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = stats.avgRating;
+            
+            // Update feedback table with user's actual feedback
             const tbody = document.querySelector('.table tbody');
             tbody.innerHTML = '';
             
-            user.feedback.forEach(item => {
-                const statusClass = item.status === 'resolved' ? 'status-resolved' : 'status-pending';
-                const statusIcon = item.status === 'resolved' ? '✅ Resolved' : '⏳ Pending';
-                
-                tbody.innerHTML += `
+            if (userFeedback.length === 0) {
+                tbody.innerHTML = `
                     <tr>
-                        <td>
-                            <div style="font-weight: 600;">${item.title}</div>
-                            <div style="color: #666; font-size: 14px;">${item.content}</div>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📝</div>
+                            <div style="font-size: 18px; margin-bottom: 10px;">No feedback submitted yet</div>
+                            <div style="font-size: 14px;">Share your thoughts and help us improve our services</div>
+                            <div style="margin-top: 20px;">
+                                <a href="submit_feedback.html" style="background: #11998e; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">✨ Submit Your First Feedback</a>
+                            </div>
                         </td>
-                        <td>${item.category}</td>
-                        <td>⭐ ${item.rating}/5</td>
-                        <td><span class="status-badge ${statusClass}">${statusIcon}</span></td>
-                        <td>${item.date}</td>
-                        <td>${item.response}</td>
                     </tr>
                 `;
-            });
+            } else {
+                userFeedback.reverse().forEach(item => {
+                    const statusClass = item.status === 'resolved' ? 'status-resolved' : 'status-pending';
+                    const statusIcon = item.status === 'resolved' ? '✅ Resolved' : '⏳ Pending';
+                    const shortContent = item.content.length > 50 ? item.content.substring(0, 50) + '...' : item.content;
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <div style="font-weight: 600;">${item.title}</div>
+                                <div style="color: #666; font-size: 14px;">${shortContent}</div>
+                            </td>
+                            <td>${item.category}</td>
+                            <td>⭐ ${item.rating}/5</td>
+                            <td><span class="status-badge ${statusClass}">${statusIcon}</span></td>
+                            <td>${item.date}</td>
+                            <td>${item.response}</td>
+                        </tr>
+                    `;
+                });
+            }
         };
 
         function showFeedbackHistory() {
             const username = localStorage.getItem('currentUser') || 'User';
-            const user = userData[username] || userData['john_doe'];
-            alert(`${username}'s complete feedback history: ${user.stats.total} total submissions`);
+            const userFeedback = JSON.parse(localStorage.getItem('feedback_' + username) || '[]');
+            alert(`${username}'s complete feedback history: ${userFeedback.length} total submissions`);
         }
 
         function showSearch() {
