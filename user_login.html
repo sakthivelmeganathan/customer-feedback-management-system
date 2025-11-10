@@ -24,6 +24,7 @@
             border-radius: 15px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
             backdrop-filter: blur(10px);
+            margin: 0 auto;
         }
         h1 { margin: 0 0 30px 0; font-size: 28px; text-align: center; color: #333; font-weight: 600; }
         label { display: block; margin-top: 20px; font-size: 14px; color: #555; font-weight: 500; }
@@ -42,6 +43,8 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         .row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+        .row input[type="checkbox"] { margin: 0; }
+        .row label { margin-top: 0; }
         button { 
             margin-top: 25px; 
             width: 100%; 
@@ -70,16 +73,16 @@
 <body>
     <div class="wrap">
         <h1>👤 User Login</h1>
-        <form>
+        <form method="post" action="/user_login">
             <label>Username
-                <input type="text" name="username" placeholder="Enter your username" required>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
             </label>
             <label>Password
-                <input type="password" name="password" placeholder="Enter your password" required>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
             </label>
             <div class="row">
                 <input type="checkbox" id="remember" name="remember">
-                <label for="remember" style="margin: 0; font-size: 13px;">Remember me</label>
+                <label for="remember">Remember me</label>
             </div>
             <button type="submit">Sign In</button>
         </form>
@@ -88,6 +91,7 @@
             <p><a href="index.html">← Back to Home</a></p>
         </div>
     </div>
+
 </body>
 </html>
 
