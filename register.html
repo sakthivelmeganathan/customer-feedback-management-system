@@ -67,7 +67,7 @@
 <body>
     <div class="wrap">
         <h1>✨ Create Account</h1>
-        <form method="post" action="/register">
+        <form onsubmit="return handleRegistration(event)">
             <label>Username
                 <input type="text" id="username" name="username" placeholder="Choose a unique username" required>
             </label>
@@ -88,6 +88,41 @@
         </div>
     </div>
 
+    <script>
+        function handleRegistration(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const regCode = document.getElementById('registration_code').value;
+            
+            // Validate registration code
+            if (regCode !== 'USER123') {
+                alert('Invalid registration code. Please enter USER123');
+                return false;
+            }
+            
+            // Simple validation
+            if (username && email && password && regCode) {
+                // Store user data in localStorage (demo purposes)
+                const userData = {
+                    username: username,
+                    email: email,
+                    password: password,
+                    created: new Date().toISOString()
+                };
+                
+                localStorage.setItem('user_' + username, JSON.stringify(userData));
+                alert('Registration successful! You can now login with your credentials.');
+                window.location.href = 'user_login.html';
+            } else {
+                alert('Please fill in all fields');
+            }
+            
+            return false;
+        }
+    </script>
 </body>
 </html>
 
