@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Login</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80') center/cover no-repeat fixed;
+            margin: 0; 
+            color: #e5e7eb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wrap { 
+            max-width: 450px; 
+            background: rgba(17, 24, 39, 0.9); 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        h1 { margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #fff; }
+        label { display: block; margin-top: 15px; font-size: 14px; color: #e5e7eb; font-weight: 500; }
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #374151; 
+            background: rgba(15, 23, 42, 0.8); 
+            color: #e5e7eb; 
+            border-radius: 8px; 
+            margin-top: 6px;
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        input::placeholder { color: rgba(156, 163, 175, 0.7); }
+        .row { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+        button { 
+            margin-top: 20px; 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: 0; 
+            border-radius: 8px; 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
+            color: #fff; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+        a { color: #a78bfa; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        .links { text-align: center; margin-top: 20px; }
+        .links p { margin: 8px 0; color: #d1d5db; }
+    </style>
+    <link rel="icon" href="data:,">
+    <meta name="color-scheme" content="light dark">
+</head>
+<body>
+    <div class="wrap">
+        <h1>🔧 Admin Access</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div style="padding: 10px; border-radius: 6px; margin-bottom: 15px; background: {% if category == 'success' %}rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3){% else %}rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3){% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="post">
+            <label>Username
+                <input type="text" name="username" placeholder="Enter admin username" required>
+            </label>
+            <label>Password
+                <input type="password" name="password" placeholder="Enter admin password" required>
+            </label>
+            <div class="row">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember" style="margin: 0; font-size: 13px;">Remember me</label>
+            </div>
+            <button type="submit">🔑 Admin Login</button>
+        </form>
+        <div class="links">
+            <p><a href="/create_admin">⚙️ Create Default Admin</a></p>
+            <p><a href="/">← Back to Home</a></p>
+        </div>
+    </div>
+    
+</body>
+</html>
+
+

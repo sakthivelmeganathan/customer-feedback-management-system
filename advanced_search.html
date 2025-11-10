@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Advanced Search</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat fixed;
+            margin: 0; 
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .search-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-label { font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px; }
+        .filter-input { padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; transition: border-color 0.3s ease; }
+        .filter-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+        .btn-outline { background: transparent; color: #667eea; border: 2px solid #667eea; }
+        .results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .result-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
+        .result-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-resolved { background: #d1fae5; color: #065f46; }
+        .badge-progress { background: #dbeafe; color: #1d4ed8; }
+        .rating { display: flex; gap: 2px; }
+        .star { color: #fbbf24; font-size: 14px; }
+        .star.empty { color: #d1d5db; }
+        .no-results { text-align: center; padding: 60px 20px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div>
+                    <h1>🔍 Advanced Search</h1>
+                    <p style="color: #6b7280; margin: 5px 0 0 0;">Find specific feedback with powerful filters</p>
+                </div>
+                <a href="/dashboard" class="btn btn-outline">← Back</a>
+            </div>
+
+            <form method="get" id="searchForm">
+                <div class="search-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Search Keywords</label>
+                        <input type="text" name="q" class="filter-input" placeholder="Search in title and content..." value="{{ request.args.get('q', '') }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select name="category" class="filter-input">
+                            <option value="">All Categories</option>
+                            <option value="Product" {{ 'selected' if request.args.get('category') == 'Product' }}>Product</option>
+                            <option value="Service" {{ 'selected' if request.args.get('category') == 'Service' }}>Service</option>
+                            <option value="Website" {{ 'selected' if request.args.get('category') == 'Website' }}>Website</option>
+                            <option value="Support" {{ 'selected' if request.args.get('category') == 'Support' }}>Support</option>
+                            <option value="Other" {{ 'selected' if request.args.get('category') == 'Other' }}>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Status</label>
+                        <select name="status" class="filter-input">
+                            <option value="">All Status</option>
+                            <option value="pending" {{ 'selected' if request.args.get('status') == 'pending' }}>Pending</option>
+                            <option value="in_progress" {{ 'selected' if request.args.get('status') == 'in_progress' }}>In Progress</option>
+                            <option value="resolved" {{ 'selected' if request.args.get('status') == 'resolved' }}>Resolved</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Rating</label>
+                        <select name="rating" class="filter-input">
+                            <option value="">All Ratings</option>
+                            <option value="5" {{ 'selected' if request.args.get('rating') == '5' }}>5 Stars</option>
+                            <option value="4" {{ 'selected' if request.args.get('rating') == '4' }}>4 Stars</option>
+                            <option value="3" {{ 'selected' if request.args.get('rating') == '3' }}>3 Stars</option>
+                            <option value="2" {{ 'selected' if request.args.get('rating') == '2' }}>2 Stars</option>
+                            <option value="1" {{ 'selected' if request.args.get('rating') == '1' }}>1 Star</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Date From</label>
+                        <input type="date" name="date_from" class="filter-input" value="{{ request.args.get('date_from', '') }}">
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Date To</label>
+                        <input type="date" name="date_to" class="filter-input" value="{{ request.args.get('date_to', '') }}">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button type="submit" class="btn btn-primary">🔍 Search</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearFilters()">🔄 Clear Filters</button>
+                    <button type="button" class="btn btn-outline" onclick="exportResults()">📥 Export Results</button>
+                </div>
+            </form>
+        </div>
+
+        {% if results is defined %}
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2>📊 Search Results ({{ results|length }} found)</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="sortBy" onchange="sortResults()" style="padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px;">
+                            <option value="date_desc">Newest First</option>
+                            <option value="date_asc">Oldest First</option>
+                            <option value="rating_desc">Highest Rating</option>
+                            <option value="rating_asc">Lowest Rating</option>
+                            <option value="status">By Status</option>
+                        </select>
+                    </div>
+                </div>
+
+                {% if results %}
+                    <div class="results-grid" id="resultsGrid">
+                        {% for feedback in results %}
+                            <div class="result-card" data-date="{{ feedback.created_at.isoformat() }}" data-rating="{{ feedback.rating }}" data-status="{{ feedback.status }}">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                                    <h3 style="margin: 0; color: #374151;">{{ feedback.title }}</h3>
+                                    <span class="badge badge-{{ feedback.status }}">{{ feedback.status.title() }}</span>
+                                </div>
+                                
+                                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                                    <div class="rating">
+                                        {% for i in range(1, 6) %}
+                                            <span class="star {% if i > feedback.rating %}empty{% endif %}">★</span>
+                                        {% endfor %}
+                                    </div>
+                                    <span style="color: #6b7280; font-size: 14px;">{{ feedback.category.name if feedback.category else 'N/A' }}</span>
+                                </div>
+
+                                <p style="color: #6b7280; line-height: 1.5; margin-bottom: 15px;">
+                                    {{ feedback.content[:120] }}{% if feedback.content|length > 120 %}...{% endif %}
+                                </p>
+
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <small style="color: #9ca3af;">{{ feedback.created_at.strftime('%b %d, %Y') }}</small>
+                                    <a href="/feedback/{{ feedback.id }}" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">View Details</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>
+                        <h3>No feedback found</h3>
+                        <p>Try adjusting your search criteria or clear filters to see all feedback</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function clearFilters() {
+            document.getElementById('searchForm').reset();
+            window.location.href = '/search';
+        }
+
+        function exportResults() {
+            const params = new URLSearchParams(window.location.search);
+            params.set('export', 'csv');
+            window.location.href = '/search?' + params.toString();
+        }
+
+        function sortResults() {
+            const sortBy = document.getElementById('sortBy').value;
+            const grid = document.getElementById('resultsGrid');
+            const cards = Array.from(grid.children);
+
+            cards.sort((a, b) => {
+                switch(sortBy) {
+                    case 'date_desc':
+                        return new Date(b.dataset.date) - new Date(a.dataset.date);
+                    case 'date_asc':
+                        return new Date(a.dataset.date) - new Date(b.dataset.date);
+                    case 'rating_desc':
+                        return parseInt(b.dataset.rating) - parseInt(a.dataset.rating);
+                    case 'rating_asc':
+                        return parseInt(a.dataset.rating) - parseInt(b.dataset.rating);
+                    case 'status':
+                        return a.dataset.status.localeCompare(b.dataset.status);
+                    default:
+                        return 0;
+                }
+            });
+
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        // Auto-submit form on filter change
+        document.querySelectorAll('.filter-input').forEach(input => {
+            if (input.type !== 'text') {
+                input.addEventListener('change', () => {
+                    document.getElementById('searchForm').submit();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

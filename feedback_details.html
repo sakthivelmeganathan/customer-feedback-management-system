@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Feedback Details</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80') center/cover no-repeat fixed;
+            margin: 0; 
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+        .badge-resolved { background: #d1fae5; color: #065f46; }
+        .badge-progress { background: #dbeafe; color: #1d4ed8; }
+        .rating { display: flex; gap: 5px; align-items: center; font-size: 20px; }
+        .star { color: #fbbf24; }
+        .star.empty { color: #d1d5db; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        .btn-outline { background: transparent; color: #667eea; border: 2px solid #667eea; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+        .timeline-item { position: relative; margin-bottom: 30px; }
+        .timeline-item::before { content: ''; position: absolute; left: -37px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: #667eea; }
+        .sentiment { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; }
+        .sentiment-positive { background: #d1fae5; color: #065f46; }
+        .sentiment-negative { background: #fef2f2; color: #991b1b; }
+        .sentiment-neutral { background: #f3f4f6; color: #374151; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div>
+                    <h1>📋 Feedback Details</h1>
+                    <p style="color: #6b7280; margin: 5px 0 0 0;">Comprehensive feedback analysis and tracking</p>
+                </div>
+                <div>
+                    <a href="/dashboard" class="btn btn-outline">← Back</a>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                <div>
+                    <div style="margin-bottom: 25px;">
+                        <h2 style="margin: 0 0 10px 0;">{{ feedback.title }}</h2>
+                        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px;">
+                            <span class="badge badge-{{ feedback.status }}">{{ feedback.status.title() }}</span>
+                            <div class="rating">
+                                {% for i in range(1, 6) %}
+                                    <span class="star {% if i > feedback.rating %}empty{% endif %}">★</span>
+                                {% endfor %}
+                                <span style="margin-left: 10px; color: #6b7280;">{{ feedback.rating }}/5</span>
+                            </div>
+                            {% if feedback.sentiment_score %}
+                                <div class="sentiment sentiment-{% if feedback.sentiment_score > 0.1 %}positive{% elif feedback.sentiment_score < -0.1 %}negative{% else %}neutral{% endif %}">
+                                    {% if feedback.sentiment_score > 0.1 %}😊 Positive
+                                    {% elif feedback.sentiment_score < -0.1 %}😞 Negative
+                                    {% else %}😐 Neutral
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <p style="color: #6b7280; font-size: 14px;">
+                            Category: <strong>{{ feedback.category.name if feedback.category else 'N/A' }}</strong> | 
+                            Submitted: <strong>{{ feedback.created_at.strftime('%B %d, %Y at %I:%M %p') }}</strong>
+                        </p>
+                    </div>
+
+                    <div style="background: #f9fafb; padding: 20px; border-radius: 10px; margin-bottom: 25px;">
+                        <h3 style="margin: 0 0 15px 0; color: #374151;">Feedback Content</h3>
+                        <p style="line-height: 1.6; color: #4b5563; margin: 0;">{{ feedback.content }}</p>
+                    </div>
+
+                    {% if feedback.response %}
+                        <div style="background: #eff6ff; padding: 20px; border-radius: 10px; border-left: 4px solid #3b82f6;">
+                            <h3 style="margin: 0 0 15px 0; color: #1e40af;">💬 Admin Response</h3>
+                            <p style="line-height: 1.6; color: #1e3a8a; margin: 0 0 10px 0;">{{ feedback.response.content }}</p>
+                            <small style="color: #6b7280;">Responded on {{ feedback.response.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small>
+                        </div>
+                    {% else %}
+                        <div style="background: #fef3c7; padding: 20px; border-radius: 10px; text-align: center;">
+                            <p style="margin: 0; color: #92400e;">⏳ Awaiting admin response</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <div class="card" style="padding: 20px; margin: 0;">
+                        <h3 style="margin: 0 0 20px 0;">📊 Feedback Analytics</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Priority Score</label>
+                            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; margin: 5px 0;">
+                                <div style="background: {% if feedback.rating >= 4 %}#10b981{% elif feedback.rating >= 3 %}#f59e0b{% else %}#ef4444{% endif %}; height: 100%; width: {{ feedback.rating * 20 }}%; border-radius: 4px;"></div>
+                            </div>
+                            <span style="font-size: 12px; color: #6b7280;">{{ feedback.rating * 20 }}% Priority</span>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Response Time</label>
+                            <p style="margin: 5px 0; font-size: 18px; font-weight: 600; color: #374151;">
+                                {% if feedback.response %}
+                                    {{ ((feedback.response.created_at - feedback.created_at).days) }} days
+                                {% else %}
+                                    {{ ((moment().utcnow() - feedback.created_at).days) if moment else 'N/A' }} days pending
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Feedback ID</label>
+                            <p style="margin: 5px 0; font-family: monospace; background: #f3f4f6; padding: 5px 8px; border-radius: 4px; font-size: 12px;">#{{ feedback.id }}</p>
+                        </div>
+
+                        {% if feedback.sentiment_score %}
+                            <div>
+                                <label style="font-size: 12px; color: #6b7280; text-transform: uppercase; font-weight: 600;">Sentiment Score</label>
+                                <p style="margin: 5px 0; font-size: 18px; font-weight: 600; color: {% if feedback.sentiment_score > 0.1 %}#10b981{% elif feedback.sentiment_score < -0.1 %}#ef4444{% else %}#f59e0b{% endif %};">
+                                    {{ "%.2f"|format(feedback.sentiment_score) }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card" style="padding: 20px; margin: 20px 0 0 0;">
+                        <h3 style="margin: 0 0 20px 0;">📈 Timeline</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4 style="margin: 0 0 5px 0; color: #374151;">Feedback Submitted</h4>
+                                <p style="margin: 0; color: #6b7280; font-size: 14px;">{{ feedback.created_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
+                            </div>
+                            {% if feedback.response %}
+                                <div class="timeline-item">
+                                    <h4 style="margin: 0 0 5px 0; color: #374151;">Admin Response</h4>
+                                    <p style="margin: 0; color: #6b7280; font-size: 14px;">{{ feedback.response.created_at.strftime('%b %d, %Y at %I:%M %p') }}</p>
+                                </div>
+                            {% endif %}
+                            {% if feedback.status == 'resolved' %}
+                                <div class="timeline-item">
+                                    <h4 style="margin: 0 0 5px 0; color: #10b981;">✅ Resolved</h4>
+                                    <p style="margin: 0; color: #6b7280; font-size: 14px;">Issue marked as resolved</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

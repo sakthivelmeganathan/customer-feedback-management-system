@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User Login</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2084&q=80') center/cover no-repeat fixed;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wrap { 
+            max-width: 400px; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            backdrop-filter: blur(10px);
+        }
+        h1 { margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #333; }
+        label { display: block; margin-top: 15px; font-size: 14px; color: #555; font-weight: 500; }
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 8px; 
+            margin-top: 6px; 
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .row { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+        button { 
+            margin-top: 20px; 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: 0; 
+            border-radius: 8px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: #fff; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        a { color: #667eea; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        .links { text-align: center; margin-top: 20px; }
+        .links p { margin: 8px 0; color: #666; }
+    </style>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <div class="wrap">
+        <h1>👤 User Login</h1>
+        <form method="post">
+            <label>Username
+                <input type="text" name="username" placeholder="Enter your username" required>
+            </label>
+            <label>Password
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </label>
+            <div class="row">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember" style="margin: 0; font-size: 13px;">Remember me</label>
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+        <div class="links">
+            <p>No account? <a href="/register">Create one here</a></p>
+            <p><a href="/">← Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>
+
+

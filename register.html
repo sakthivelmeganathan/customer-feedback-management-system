@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Account</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=2126&q=80') center/cover no-repeat fixed;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .wrap { 
+            max-width: 450px; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
+            backdrop-filter: blur(10px);
+        }
+        h1 { margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #333; }
+        label { display: block; margin-top: 15px; font-size: 14px; color: #555; font-weight: 500; }
+        input[type="text"], input[type="email"], input[type="password"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 8px; 
+            margin-top: 6px; 
+            transition: border-color 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        button { 
+            margin-top: 20px; 
+            width: 100%; 
+            padding: 12px 14px; 
+            border: 0; 
+            border-radius: 8px; 
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); 
+            color: #fff; 
+            cursor: pointer; 
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+        a { color: #10b981; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        .links { text-align: center; margin-top: 20px; }
+        .links p { margin: 8px 0; color: #666; }
+        .alert { padding: 10px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    </style>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <div class="wrap">
+        <h1>✨ Create Account</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="post">
+            <label>Username
+                <input type="text" name="username" placeholder="Choose a unique username" required>
+            </label>
+            <label>Email
+                <input type="email" name="email" placeholder="your.email@example.com" required>
+            </label>
+            <label>Password
+                <input type="password" name="password" placeholder="Create a secure password" required>
+            </label>
+            <label>Registration Code
+                <input type="text" name="registration_code" placeholder="Enter USER123" required>
+            </label>
+            <button type="submit">🎆 Create Account</button>
+        </form>
+        <div class="links">
+            <p>Already have an account? <a href="/user_login">Sign in here</a></p>
+            <p><a href="/">← Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>
+
+

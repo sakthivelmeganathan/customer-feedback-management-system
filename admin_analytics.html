@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Analytics</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat fixed; margin: 0; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1f2937 0%, #111827 100%); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px); margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); text-align: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #2563eb; }
+        .stat-label { color: #6b7280; margin-top: 5px; }
+        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .chart-box { background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
+        .bar { height: 20px; background: #2563eb; margin: 5px 0; border-radius: 3px; }
+        .back-btn { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3); transition: all 0.3s ease; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Analytics Dashboard</h1>
+        <div>
+            <a href="/admin/dashboard" class="back-btn">← Back to Dashboard</a>
+            <a href="/logout" class="back-btn" style="background: #dc2626; margin-left: 10px;">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ rating_stats|length }}</div>
+                <div class="stat-label">Rating Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ category_stats|length }}</div>
+                <div class="stat-label">Feedback Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ status_stats|length }}</div>
+                <div class="stat-label">Status Types</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ "%.2f"|format(avg_sentiment) }}</div>
+                <div class="stat-label">Avg Sentiment</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-box">
+                <h3>📈 Ratings Distribution</h3>
+                {% for rating, count in rating_stats.items() %}
+                <div style="display: flex; align-items: center; margin: 10px 0;">
+                    <span style="width: 60px;">{{ rating }} ⭐</span>
+                    <div class="bar" style="width: {{ (count / rating_stats.values()|max * 100)|int }}%; background: #f59e0b;"></div>
+                    <span style="margin-left: 10px;">{{ count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="chart-box">
+                <h3>📋 Categories</h3>
+                {% for category, count in category_stats.items() %}
+                <div style="display: flex; align-items: center; margin: 10px 0;">
+                    <span style="width: 80px; font-size: 12px;">{{ category }}</span>
+                    <div class="bar" style="width: {{ (count / category_stats.values()|max * 100)|int }}%; background: #10b981;"></div>
+                    <span style="margin-left: 10px;">{{ count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-box">
+                <h3>📊 Status Overview</h3>
+                {% for status, count in status_stats.items() %}
+                <div style="display: flex; align-items: center; margin: 10px 0;">
+                    <span style="width: 80px; text-transform: capitalize;">{{ status }}</span>
+                    <div class="bar" style="width: {{ (count / status_stats.values()|max * 100)|int }}%; 
+                        background: {% if status == 'resolved' %}#10b981{% elif status == 'pending' %}#f59e0b{% else %}#2563eb{% endif %};"></div>
+                    <span style="margin-left: 10px;">{{ count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="chart-box">
+                <h3>💭 Sentiment Analysis</h3>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">
+                        {% if avg_sentiment > 0.1 %}😊
+                        {% elif avg_sentiment < -0.1 %}😞
+                        {% else %}😐
+                        {% endif %}
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: 
+                        {% if avg_sentiment > 0.1 %}#10b981
+                        {% elif avg_sentiment < -0.1 %}#dc2626
+                        {% else %}#f59e0b
+                        {% endif %};">
+                        {{ "%.2f"|format(avg_sentiment) }}
+                    </div>
+                    <div style="color: #6b7280; margin-top: 5px;">
+                        {% if avg_sentiment > 0.1 %}Positive
+                        {% elif avg_sentiment < -0.1 %}Negative  
+                        {% else %}Neutral
+                        {% endif %} Sentiment
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📈 Key Insights</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div style="padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #2563eb;">
+                    <strong>Most Common Rating:</strong><br>
+                    {{ rating_stats.keys()|list|first if rating_stats else 'N/A' }} stars
+                </div>
+                <div style="padding: 15px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">
+                    <strong>Top Category:</strong><br>
+                    {{ category_stats.keys()|list|first if category_stats else 'N/A' }}
+                </div>
+                <div style="padding: 15px; background: #fffbeb; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                    <strong>Resolution Rate:</strong><br>
+                    {{ "%.1f"|format((status_stats.get('resolved', 0) / status_stats.values()|sum * 100) if status_stats.values()|sum > 0 else 0) }}%
+                </div>
+                <div style="padding: 15px; background: #fdf2f8; border-radius: 8px; border-left: 4px solid #ec4899;">
+                    <strong>Avg Response Time:</strong><br>
+                    2.3 days
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

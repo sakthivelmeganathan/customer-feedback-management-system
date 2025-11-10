@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Customer Feedback</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover no-repeat fixed;
+            color: #222; 
+            min-height: 100vh;
+        }
+        header { background: rgba(31, 41, 55, 0.9); color: #fff; padding: 10px; text-align: center; backdrop-filter: blur(10px); }
+        main { max-width: 960px; margin: 0 auto; padding: 0 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; }
+        .card { background: rgba(255, 255, 255, 0.95); border-radius: 10px; padding: 24px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); backdrop-filter: blur(10px); }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; justify-content: center; }
+        a.button { display: inline-block; padding: 12px 20px; border-radius: 8px; text-decoration: none; color: #fff; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s ease; font-size: 16px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        a.button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6); }
+        a.button.secondary { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4); }
+        a.button.secondary:hover { box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6); }
+        a.button.outline { background: linear-gradient(135deg, #434343 0%, #000000 100%); box-shadow: 0 4px 15px rgba(17, 24, 39, 0.4); }
+        a.button.outline:hover { box-shadow: 0 6px 20px rgba(17, 24, 39, 0.6); }
+        footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; color: rgba(255, 255, 255, 0.8); padding: 10px; background: rgba(0, 0, 0, 0.5); border-top: 1px solid rgba(255, 255, 255, 0.2); }
+    </style>
+    <link rel="icon" href="data:,">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="Customer Feedback Management System">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="referrer" content="no-referrer" />
+</head>
+<body>
+    <header>
+        <h2 style="margin: 5px 0;">🎯 Customer Feedback Management System</h2>
+        <p style="margin: 5px 0; opacity: 0.9; font-size: 14px;">Your voice matters - Share feedback and drive positive change</p>
+    </header>
+    <main>
+        <div style="text-align: center;">
+            <p style="margin-bottom: 30px; color: white; font-size: 22px; font-weight: 500;">Welcome! Choose an option to continue:</p>
+            <div class="actions">
+                <a class="button" href="/user_login">User Login</a>
+                <a class="button outline" href="/admin/login">Admin Login</a>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <small>&copy; <span id="y"></span> Feedback System</small>
+    </footer>
+    <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
+
+
