@@ -140,13 +140,74 @@
     </div>
 
     <script>
+        // User-specific data
+        const userData = {
+            'john_doe': {
+                stats: { total: 5, resolved: 3, pending: 2, avgRating: 4.2 },
+                feedback: [
+                    { title: 'Login Issues', content: 'Having trouble logging in with 2FA...', category: 'Support', rating: 2, status: 'pending', date: 'Jan 20, 2024', response: 'No response' },
+                    { title: 'Great New Features', content: 'Love the new dashboard design...', category: 'Product', rating: 5, status: 'resolved', date: 'Jan 18, 2024', response: '💬 View' },
+                    { title: 'Mobile App Suggestion', content: 'Would be great to have offline mode...', category: 'Product', rating: 4, status: 'pending', date: 'Jan 15, 2024', response: 'No response' }
+                ]
+            },
+            'sarah_smith': {
+                stats: { total: 2, resolved: 1, pending: 1, avgRating: 3.5 },
+                feedback: [
+                    { title: 'Billing Question', content: 'Need clarification on my invoice...', category: 'Service', rating: 3, status: 'resolved', date: 'Jan 19, 2024', response: '💬 View' },
+                    { title: 'Feature Request', content: 'Please add dark mode option...', category: 'Product', rating: 4, status: 'pending', date: 'Jan 16, 2024', response: 'No response' }
+                ]
+            },
+            'mike_wilson': {
+                stats: { total: 4, resolved: 2, pending: 2, avgRating: 4.5 },
+                feedback: [
+                    { title: 'Excellent Support', content: 'Quick response from support team...', category: 'Service', rating: 5, status: 'resolved', date: 'Jan 21, 2024', response: '💬 View' },
+                    { title: 'Website Speed', content: 'Pages load faster now, great improvement...', category: 'Website', rating: 4, status: 'resolved', date: 'Jan 17, 2024', response: '💬 View' },
+                    { title: 'Documentation Update', content: 'API docs need more examples...', category: 'Product', rating: 4, status: 'pending', date: 'Jan 14, 2024', response: 'No response' }
+                ]
+            }
+        };
+
         window.onload = function() {
             const username = localStorage.getItem('currentUser') || 'User';
             document.getElementById('username').textContent = username;
+            
+            // Load user-specific data
+            const user = userData[username] || userData['john_doe']; // Default fallback
+            
+            // Update stats
+            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = user.stats.total;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = user.stats.resolved;
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = user.stats.pending;
+            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = user.stats.avgRating;
+            
+            // Update feedback table
+            const tbody = document.querySelector('.table tbody');
+            tbody.innerHTML = '';
+            
+            user.feedback.forEach(item => {
+                const statusClass = item.status === 'resolved' ? 'status-resolved' : 'status-pending';
+                const statusIcon = item.status === 'resolved' ? '✅ Resolved' : '⏳ Pending';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${item.title}</div>
+                            <div style="color: #666; font-size: 14px;">${item.content}</div>
+                        </td>
+                        <td>${item.category}</td>
+                        <td>⭐ ${item.rating}/5</td>
+                        <td><span class="status-badge ${statusClass}">${statusIcon}</span></td>
+                        <td>${item.date}</td>
+                        <td>${item.response}</td>
+                    </tr>
+                `;
+            });
         };
 
         function showFeedbackHistory() {
-            alert('Showing your complete feedback history with filtering options.');
+            const username = localStorage.getItem('currentUser') || 'User';
+            const user = userData[username] || userData['john_doe'];
+            alert(`${username}'s complete feedback history: ${user.stats.total} total submissions`);
         }
 
         function showSearch() {
