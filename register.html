@@ -67,17 +67,6 @@
 <body>
     <div class="wrap">
         <h1>✨ Create Account</h1>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
         <form method="post">
             <label>Username
                 <input type="text" name="username" placeholder="Choose a unique username" required>
@@ -94,8 +83,8 @@
             <button type="submit">🎆 Create Account</button>
         </form>
         <div class="links">
-            <p>Already have an account? <a href="/user_login">Sign in here</a></p>
-            <p><a href="/">← Back to Home</a></p>
+            <p>Already have an account? <a href="user_login.html">Sign in here</a></p>
+            <p><a href="index.html">← Back to Home</a></p>
         </div>
     </div>
 </body>
