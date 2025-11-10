@@ -262,7 +262,84 @@
         }
 
         function refreshData() {
-            location.reload();
+            loadAllFeedback();
+        }
+        
+        // Load all feedback for admin dashboard
+        window.addEventListener('DOMContentLoaded', function() {
+            loadAllFeedback();
+        });
+        
+        function loadAllFeedback() {
+            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            const tbody = document.querySelector('.table tbody');
+            
+            // Calculate admin stats
+            const totalFeedback = allFeedback.length;
+            const resolvedCount = allFeedback.filter(f => f.status === 'resolved').length;
+            const pendingCount = allFeedback.filter(f => f.status === 'pending').length;
+            const avgRating = totalFeedback > 0 ? (allFeedback.reduce((sum, f) => sum + f.rating, 0) / totalFeedback).toFixed(1) : 0;
+            
+            // Update admin stats
+            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = totalFeedback;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = resolvedCount;
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = pendingCount;
+            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = avgRating;
+            
+            // Clear and populate feedback table
+            tbody.innerHTML = '';
+            
+            if (allFeedback.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
+                            <div style="font-size: 18px;">No feedback received yet</div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                allFeedback.reverse().forEach(item => {
+                    const statusClass = item.status === 'resolved' ? 'badge-resolved' : 'badge-pending';
+                    const statusText = item.status === 'resolved' ? 'Resolved' : 'Pending';
+                    const shortContent = item.content.length > 50 ? item.content.substring(0, 50) + '...' : item.content;
+                    
+                    tbody.innerHTML += `
+                        <tr data-content="${item.content.replace(/"/g, '&quot;').replace(/\n/g, ' ')}">
+                            <td>${item.user}</td>
+                            <td>${item.title}</td>
+                            <td>${item.category}</td>
+                            <td>⭐ ${item.rating}/5</td>
+                            <td><span class="badge ${statusClass}">${statusText}</span></td>
+                            <td>${item.date}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="showResponse(${item.id})">💬 Respond</button>
+                                <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(${item.id})">👁️ View</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteFeedback(${item.id})">🗑️ Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        }
+        
+        function deleteFeedback(feedbackId) {
+            if (confirm('Delete this feedback?')) {
+                let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+                allFeedback = allFeedback.filter(f => f.id !== feedbackId);
+                localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+                
+                // Also remove from user's personal feedback
+                const feedbackToDelete = allFeedback.find(f => f.id === feedbackId);
+                if (feedbackToDelete) {
+                    const userFeedbackKey = 'feedback_' + feedbackToDelete.user;
+                    let userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+                    userFeedback = userFeedback.filter(f => f.id !== feedbackId);
+                    localStorage.setItem(userFeedbackKey, JSON.stringify(userFeedback));
+                }
+                
+                loadAllFeedback();
+            }
         }
     </script>
 </body>
