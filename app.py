@@ -4,10 +4,12 @@ from flask_migrate import Migrate
 from models import db, User
 from sqlalchemy import event, text, Engine
 import os
+import pymysql
+pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///feedback.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/customer_feedback_management_system'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_size': 10,
