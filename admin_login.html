@@ -76,17 +76,6 @@
 <body>
     <div class="wrap">
         <h1>🔧 Admin Access</h1>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div style="padding: 10px; border-radius: 6px; margin-bottom: 15px; background: {% if category == 'success' %}rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3){% else %}rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3){% endif %};">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
         <form method="post">
             <label>Username
                 <input type="text" name="username" placeholder="Enter admin username" required>
@@ -101,8 +90,8 @@
             <button type="submit">🔑 Admin Login</button>
         </form>
         <div class="links">
-            <p><a href="/create_admin">⚙️ Create Default Admin</a></p>
-            <p><a href="/">← Back to Home</a></p>
+            <p><a href="create_admin.html">⚙️ Create Default Admin</a></p>
+            <p><a href="index.html">← Back to Home</a></p>
         </div>
     </div>
     
