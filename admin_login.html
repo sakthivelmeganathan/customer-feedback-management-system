@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Login</title>
     <style>
+        * { box-sizing: border-box; }
         body { 
             font-family: Arial, sans-serif; 
             background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80') center/cover no-repeat fixed;
@@ -14,27 +15,30 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         .wrap { 
-            max-width: 450px; 
+            width: 100%;
+            max-width: 420px; 
             background: rgba(17, 24, 39, 0.9); 
-            padding: 30px; 
+            padding: 40px; 
             border-radius: 15px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
             backdrop-filter: blur(10px);
             border: 1px solid rgba(75, 85, 99, 0.3);
         }
-        h1 { margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #fff; }
-        label { display: block; margin-top: 15px; font-size: 14px; color: #e5e7eb; font-weight: 500; }
+        h1 { margin: 0 0 30px 0; font-size: 28px; text-align: center; color: #fff; font-weight: 600; }
+        label { display: block; margin-top: 20px; font-size: 14px; color: #e5e7eb; font-weight: 500; }
         input[type="text"], input[type="password"] { 
             width: 100%; 
-            padding: 12px; 
+            padding: 14px; 
             border: 2px solid #374151; 
             background: rgba(15, 23, 42, 0.8); 
             color: #e5e7eb; 
             border-radius: 8px; 
-            margin-top: 6px;
-            transition: border-color 0.3s ease;
+            margin-top: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
         input[type="text"]:focus, input[type="password"]:focus {
             outline: none;
@@ -42,17 +46,18 @@
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
         input::placeholder { color: rgba(156, 163, 175, 0.7); }
-        .row { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         button { 
-            margin-top: 20px; 
+            margin-top: 25px; 
             width: 100%; 
-            padding: 12px 14px; 
+            padding: 14px; 
             border: 0; 
             border-radius: 8px; 
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
             color: #fff; 
             cursor: pointer; 
             font-size: 16px;
+            font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
         }
@@ -62,8 +67,8 @@
         }
         a { color: #a78bfa; text-decoration: none; font-weight: 500; }
         a:hover { text-decoration: underline; }
-        .links { text-align: center; margin-top: 20px; }
-        .links p { margin: 8px 0; color: #d1d5db; }
+        .links { text-align: center; margin-top: 25px; }
+        .links p { margin: 10px 0; color: #d1d5db; font-size: 14px; }
     </style>
     <link rel="icon" href="data:,">
     <meta name="color-scheme" content="light dark">
@@ -96,7 +101,7 @@
             <button type="submit">🔑 Admin Login</button>
         </form>
         <div class="links">
-            <p><a href="admin_register.html">⚙️ Create Default Admin</a></p>
+            <p><a href="/create_admin">⚙️ Create Default Admin</a></p>
             <p><a href="/">← Back to Home</a></p>
         </div>
     </div>
