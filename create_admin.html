@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Admin</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=2126&q=80') center/cover no-repeat fixed;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .wrap { 
+            width: 100%;
+            max-width: 420px; 
+            background: rgba(17, 24, 39, 0.9); 
+            padding: 40px; 
+            border-radius: 15px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        h1 { margin: 0 0 30px 0; font-size: 28px; text-align: center; color: #fff; font-weight: 600; }
+        label { display: block; margin-top: 20px; font-size: 14px; color: #e5e7eb; font-weight: 500; }
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 14px; 
+            border: 2px solid #374151; 
+            border-radius: 8px; 
+            margin-top: 8px; 
+            background: rgba(15, 23, 42, 0.8);
+            color: #e5e7eb;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        input::placeholder { color: rgba(156, 163, 175, 0.7); }
+        button { 
+            margin-top: 25px; 
+            width: 100%; 
+            padding: 14px; 
+            border: 0; 
+            border-radius: 8px; 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); 
+            color: #fff; 
+            cursor: pointer; 
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+        a { color: #a78bfa; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        .links { text-align: center; margin-top: 25px; }
+        .links p { margin: 10px 0; color: #d1d5db; font-size: 14px; }
+        .info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center; }
+    </style>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <div class="wrap">
+        <h1>⚙️ Create Default Admin</h1>
+        <div class="info">
+            This will create a default admin account with username: <strong>admin</strong> and password: <strong>admin123</strong>
+        </div>
+        <form method="post">
+            <label>Admin Username
+                <input type="text" name="username" value="admin" placeholder="Enter admin username" required>
+            </label>
+            <label>Admin Password
+                <input type="password" name="password" value="admin123" placeholder="Enter admin password" required>
+            </label>
+            <button type="submit">🔐 Create Admin Account</button>
+        </form>
+        <div class="links">
+            <p><a href="admin_login.html">← Back to Admin Login</a></p>
+            <p><a href="index.html">Back to Home</a></p>
+        </div>
+    </div>
+</body>
+</html>
