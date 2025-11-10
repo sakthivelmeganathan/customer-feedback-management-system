@@ -30,31 +30,31 @@
     <div class="header">
         <h1>📊 Admin Control Center</h1>
         <div>
-            <a href="/admin/analytics" class="logout-btn" style="background: #10b981; margin-right: 10px;">📊 Analytics</a>
-            <a href="/admin/bulk-actions" class="logout-btn" style="background: #f59e0b; margin-right: 10px;">⚡ Bulk Actions</a>
-            <a href="/admin/download-feedback" class="logout-btn" style="background: #6366f1; margin-right: 10px;">📥 Export</a>
-            <a href="/admin/register" class="logout-btn" style="background: #8b5cf6; margin-right: 10px;">👤 Add Admin</a>
+            <a href="admin_analytics.html" class="logout-btn" style="background: #10b981; margin-right: 10px;">📊 Analytics</a>
+            <a href="bulk_actions.html" class="logout-btn" style="background: #f59e0b; margin-right: 10px;">⚡ Bulk Actions</a>
+            <a href="#" class="logout-btn" style="background: #6366f1; margin-right: 10px;">📥 Export</a>
+            <a href="admin_register.html" class="logout-btn" style="background: #8b5cf6; margin-right: 10px;">👤 Add Admin</a>
             <span style="margin-right: 15px;">Welcome, Admin</span>
-            <a href="/logout" class="logout-btn">Logout</a>
+            <a href="index.html" class="logout-btn">Logout</a>
         </div>
     </div>
 
     <div class="container">
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number">{{ total_feedback }}</div>
+                <div class="stat-number">147</div>
                 <div class="stat-label">Total Feedback</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">{{ resolved_count }}</div>
+                <div class="stat-number">89</div>
                 <div class="stat-label">Resolved</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">{{ pending_count }}</div>
+                <div class="stat-number">58</div>
                 <div class="stat-label">Pending</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">{{ "%.1f"|format(avg_rating) }}</div>
+                <div class="stat-number">4.1</div>
                 <div class="stat-label">Avg Rating</div>
             </div>
         </div>
@@ -63,9 +63,9 @@
             <div class="card" style="flex: 1;">
                 <h4>Quick Actions</h4>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="/admin/analytics" class="btn btn-primary">📊 View Analytics</a>
-                    <a href="/admin/download-feedback" class="btn" style="background: #f59e0b; color: white;">📥 Export Data</a>
-                    <a href="/admin/register" class="btn" style="background: #8b5cf6; color: white;">👤 Add Admin</a>
+                    <a href="admin_analytics.html" class="btn btn-primary">📊 View Analytics</a>
+                    <a href="#" class="btn" style="background: #f59e0b; color: white;">📥 Export Data</a>
+                    <a href="admin_register.html" class="btn" style="background: #8b5cf6; color: white;">👤 Add Admin</a>
                     <button class="btn" style="background: #10b981; color: white;" onclick="refreshData()">🔄 Refresh</button>
                 </div>
             </div>
@@ -74,19 +74,19 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                     <div>
                         <strong>Response Rate:</strong><br>
-                        <span style="color: #10b981;">{{ "%.1f"|format((resolved_count/total_feedback*100) if total_feedback > 0 else 0) }}%</span>
+                        <span style="color: #10b981;">60.5%</span>
                     </div>
                     <div>
                         <strong>Active Users:</strong><br>
-                        <span style="color: #2563eb;">{{ feedbacks|map(attribute='user')|unique|list|length }}</span>
+                        <span style="color: #2563eb;">43</span>
                     </div>
                     <div>
                         <strong>Categories:</strong><br>
-                        <span style="color: #f59e0b;">{{ feedbacks|map(attribute='category.name')|unique|list|length }}</span>
+                        <span style="color: #f59e0b;">5</span>
                     </div>
                     <div>
                         <strong>This Month:</strong><br>
-                        <span style="color: #8b5cf6;">{{ feedbacks|selectattr('created_at', 'ge', (moment().startOf('month')))|list|length if moment else 'N/A' }}</span>
+                        <span style="color: #8b5cf6;">32</span>
                     </div>
                 </div>
             </div>
@@ -104,11 +104,11 @@
                     </select>
                     <select id="categoryFilter" onchange="filterFeedback()" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="all">All Categories</option>
-                        {% for feedback in feedbacks %}
-                            {% if feedback.category %}
-                                <option value="{{ feedback.category.name }}">{{ feedback.category.name }}</option>
-                            {% endif %}
-                        {% endfor %}
+                        <option value="Product">Product</option>
+                        <option value="Service">Service</option>
+                        <option value="Website">Website</option>
+                        <option value="Support">Support</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
             </div>
@@ -125,29 +125,84 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for feedback in feedbacks %}
-                    <tr data-content="{{ feedback.content|replace('"', '&quot;')|replace('\n', ' ') }}">
-                        <td>{{ feedback.user.username }}</td>
-                        <td>{{ feedback.title }}</td>
-                        <td>{{ feedback.category.name if feedback.category else 'N/A' }}</td>
-                        <td>⭐ {{ feedback.rating }}/5</td>
+                    <tr data-content="The new checkout process is much smoother than before. However, I noticed that the payment confirmation email takes a while to arrive. Overall satisfied with the improvements made.">
+                        <td>alexandra_chen</td>
+                        <td>Checkout Process Improvement</td>
+                        <td>Website</td>
+                        <td>⭐ 4/5</td>
+                        <td><span class="badge badge-resolved">Resolved</span></td>
+                        <td>2024-01-18</td>
                         <td>
-                            {% if feedback.status == 'resolved' %}
-                                <span class="badge badge-resolved">Resolved</span>
-                            {% else %}
-                                <span class="badge badge-pending">Pending</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ feedback.created_at.strftime('%Y-%m-%d') }}</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="showResponse({{ feedback.id }})">💬 Respond</button>
-                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails({{ feedback.id }})">👁️ View</button>
-                            <form method="post" action="/admin/delete-feedback/{{ feedback.id }}" style="display: inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
-                            </form>
+                            <button class="btn btn-primary btn-sm" onclick="showResponse(1)">💬 Respond</button>
+                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(1)">👁️ View</button>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
                         </td>
                     </tr>
-                    {% endfor %}
+                    <tr data-content="I've been trying to reach customer support for 3 days regarding my order #12345. The phone lines are always busy and email responses are delayed. This is quite frustrating as a loyal customer.">
+                        <td>robert_martinez</td>
+                        <td>Support Response Time</td>
+                        <td>Support</td>
+                        <td>⭐ 2/5</td>
+                        <td><span class="badge badge-pending">Pending</span></td>
+                        <td>2024-01-17</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showResponse(2)">💬 Respond</button>
+                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(2)">👁️ View</button>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                    <tr data-content="Love the new product features! The dashboard is intuitive and the reporting functionality saves me hours of work. My team has been more productive since we started using this. Keep up the great work!">
+                        <td>jennifer_thompson</td>
+                        <td>New Dashboard Features</td>
+                        <td>Product</td>
+                        <td>⭐ 5/5</td>
+                        <td><span class="badge badge-resolved">Resolved</span></td>
+                        <td>2024-01-16</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showResponse(3)">💬 Respond</button>
+                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(3)">👁️ View</button>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                    <tr data-content="The mobile app crashes frequently when I try to upload photos. This happens on both iOS and Android devices. Please fix this issue as it's affecting my daily workflow.">
+                        <td>david_kim</td>
+                        <td>Mobile App Stability</td>
+                        <td>Product</td>
+                        <td>⭐ 2/5</td>
+                        <td><span class="badge badge-pending">Pending</span></td>
+                        <td>2024-01-15</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showResponse(4)">💬 Respond</button>
+                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(4)">👁️ View</button>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                    <tr data-content="Excellent service from start to finish. The delivery was on time, packaging was perfect, and the product quality exceeded my expectations. Will definitely recommend to friends and family.">
+                        <td>maria_gonzalez</td>
+                        <td>Outstanding Service Experience</td>
+                        <td>Service</td>
+                        <td>⭐ 5/5</td>
+                        <td><span class="badge badge-resolved">Resolved</span></td>
+                        <td>2024-01-14</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showResponse(5)">💬 Respond</button>
+                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(5)">👁️ View</button>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                    <tr data-content="The website search function needs improvement. When I search for specific products, irrelevant results appear first. Also, the filter options are limited and don't help narrow down results effectively.">
+                        <td>thomas_anderson</td>
+                        <td>Search Functionality Issues</td>
+                        <td>Website</td>
+                        <td>⭐ 3/5</td>
+                        <td><span class="badge badge-pending">Pending</span></td>
+                        <td>2024-01-13</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="showResponse(6)">💬 Respond</button>
+                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(6)">👁️ View</button>
+                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -174,7 +229,7 @@
 
     <script>
         function showResponse(feedbackId) {
-            document.getElementById('responseForm').action = '/admin/respond/' + feedbackId;
+            document.getElementById('responseForm').action = '#';
             document.getElementById('responseModal').style.display = 'block';
         }
 
