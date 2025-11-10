@@ -67,18 +67,18 @@
 <body>
     <div class="wrap">
         <h1>✨ Create Account</h1>
-        <form>
+        <form method="post" action="/register">
             <label>Username
-                <input type="text" name="username" placeholder="Choose a unique username" required>
+                <input type="text" id="username" name="username" placeholder="Choose a unique username" required>
             </label>
             <label>Email
-                <input type="email" name="email" placeholder="your.email@example.com" required>
+                <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
             </label>
             <label>Password
-                <input type="password" name="password" placeholder="Create a secure password" required>
+                <input type="password" id="password" name="password" placeholder="Create a secure password" required>
             </label>
             <label>Registration Code
-                <input type="text" name="registration_code" placeholder="Enter USER123" required>
+                <input type="text" id="registration_code" name="registration_code" placeholder="Enter USER123" required>
             </label>
             <button type="submit">🎆 Create Account</button>
         </form>
@@ -87,6 +87,7 @@
             <p><a href="index.html">← Back to Home</a></p>
         </div>
     </div>
+
 </body>
 </html>
 
