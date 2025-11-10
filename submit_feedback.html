@@ -186,9 +186,10 @@
                 return false;
             }
             
-            // Store feedback (in real app, this would go to database)
+            // Store feedback for specific user
             const username = localStorage.getItem('currentUser') || 'User';
             const feedback = {
+                id: Date.now(),
                 title: title,
                 category: category,
                 rating: parseInt(rating),
@@ -199,18 +200,42 @@
                     month: 'short', 
                     day: 'numeric' 
                 }),
-                user: username
+                user: username,
+                response: 'No response'
             };
             
-            // Store in localStorage (demo purposes)
-            const existingFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
-            existingFeedback.push(feedback);
-            localStorage.setItem('userFeedback', JSON.stringify(existingFeedback));
+            // Store user-specific feedback
+            const userFeedbackKey = 'feedback_' + username;
+            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+            userFeedback.push(feedback);
+            localStorage.setItem(userFeedbackKey, JSON.stringify(userFeedback));
+            
+            // Store in global feedback for admin dashboard
+            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            allFeedback.push(feedback);
+            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
             
             alert('Thank you! Your feedback has been submitted successfully.');
+            // Update user dashboard data
+            updateUserDashboard(username);
             window.location.href = 'dashboard.html';
             
             return false;
+        }
+        
+        function updateUserDashboard(username) {
+            // Update user's dashboard statistics
+            const userFeedbackKey = 'feedback_' + username;
+            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+            
+            const stats = {
+                total: userFeedback.length,
+                resolved: userFeedback.filter(f => f.status === 'resolved').length,
+                pending: userFeedback.filter(f => f.status === 'pending').length,
+                avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
+            };
+            
+            localStorage.setItem('stats_' + username, JSON.stringify(stats));
         }
     </script>
 </body>
