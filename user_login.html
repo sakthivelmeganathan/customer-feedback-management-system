@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>User Login</title>
     <style>
+        * { box-sizing: border-box; }
         body { 
             font-family: Arial, sans-serif; 
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2084&q=80') center/cover no-repeat fixed;
@@ -13,41 +14,45 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         .wrap { 
-            max-width: 400px; 
+            width: 100%;
+            max-width: 420px; 
             background: rgba(255, 255, 255, 0.95); 
-            padding: 30px; 
+            padding: 40px; 
             border-radius: 15px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.3); 
             backdrop-filter: blur(10px);
         }
-        h1 { margin: 0 0 20px 0; font-size: 24px; text-align: center; color: #333; }
-        label { display: block; margin-top: 15px; font-size: 14px; color: #555; font-weight: 500; }
+        h1 { margin: 0 0 30px 0; font-size: 28px; text-align: center; color: #333; font-weight: 600; }
+        label { display: block; margin-top: 20px; font-size: 14px; color: #555; font-weight: 500; }
         input[type="text"], input[type="password"] { 
             width: 100%; 
-            padding: 12px; 
+            padding: 14px; 
             border: 2px solid #e5e7eb; 
             border-radius: 8px; 
-            margin-top: 6px; 
-            transition: border-color 0.3s ease;
+            margin-top: 8px; 
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
         input[type="text"]:focus, input[type="password"]:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        .row { display: flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .row { display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         button { 
-            margin-top: 20px; 
+            margin-top: 25px; 
             width: 100%; 
-            padding: 12px 14px; 
+            padding: 14px; 
             border: 0; 
             border-radius: 8px; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             color: #fff; 
             cursor: pointer; 
             font-size: 16px;
+            font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
@@ -57,8 +62,8 @@
         }
         a { color: #667eea; text-decoration: none; font-weight: 500; }
         a:hover { text-decoration: underline; }
-        .links { text-align: center; margin-top: 20px; }
-        .links p { margin: 8px 0; color: #666; }
+        .links { text-align: center; margin-top: 25px; }
+        .links p { margin: 10px 0; color: #666; font-size: 14px; }
     </style>
     <link rel="icon" href="data:,">
 </head>
@@ -79,8 +84,8 @@
             <button type="submit">Sign In</button>
         </form>
         <div class="links">
-            <p>No account? <a href="/register">Create one here</a></p>
-            <p><a href="/">← Back to Home</a></p>
+            <p>No account? <a href="register.html">Create one here</a></p>
+            <p><a href="index.html">← Back to Home</a></p>
         </div>
     </div>
 </body>
