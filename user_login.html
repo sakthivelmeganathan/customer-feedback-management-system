@@ -73,7 +73,7 @@
 <body>
     <div class="wrap">
         <h1>👤 User Login</h1>
-        <form method="post" action="/user_login">
+        <form onsubmit="return handleUserLogin(event)">
             <label>Username
                 <input type="text" id="username" name="username" placeholder="Enter your username" required>
             </label>
@@ -92,6 +92,36 @@
         </div>
     </div>
 
+    <script>
+        function handleUserLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Check if user exists in localStorage
+            const userData = localStorage.getItem('user_' + username);
+            
+            if (userData) {
+                const user = JSON.parse(userData);
+                if (user.password === password) {
+                    localStorage.setItem('currentUser', username);
+                    window.location.href = 'dashboard.html';
+                    return false;
+                }
+            }
+            
+            // Fallback - accept any credentials
+            if (username && password) {
+                localStorage.setItem('currentUser', username);
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Please enter both username and password');
+            }
+            
+            return false;
+        }
+    </script>
 </body>
 </html>
 
