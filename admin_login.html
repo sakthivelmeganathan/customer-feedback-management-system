@@ -76,12 +76,12 @@
 <body>
     <div class="wrap">
         <h1>🔧 Admin Access</h1>
-        <form>
+        <form onsubmit="return handleLogin(event)">
             <label>Username
-                <input type="text" name="username" placeholder="Enter admin username" required>
+                <input type="text" id="username" name="username" placeholder="Enter admin username" required>
             </label>
             <label>Password
-                <input type="password" name="password" placeholder="Enter admin password" required>
+                <input type="password" id="password" name="password" placeholder="Enter admin password" required>
             </label>
             <div class="row">
                 <input type="checkbox" id="remember" name="remember">
@@ -95,6 +95,40 @@
         </div>
     </div>
     
+    <script>
+        // Check URL parameters on page load
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const username = urlParams.get('username');
+            const password = urlParams.get('password');
+            
+            if (username && password) {
+                document.getElementById('username').value = username;
+                document.getElementById('password').value = password;
+                
+                // Auto-login if credentials are provided
+                if (username === 'admin' && password === 'admin123') {
+                    window.location.href = 'admin_dashboard.html';
+                }
+            }
+        };
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Simple credential check
+            if (username === 'admin' && password === 'admin123') {
+                window.location.href = 'admin_dashboard.html';
+            } else {
+                alert('Invalid credentials. Use admin/admin123');
+            }
+            
+            return false;
+        }
+    </script>
 </body>
 </html>
 
