@@ -30,10 +30,6 @@
     <div class="header">
         <h1>📊 Admin Control Center</h1>
         <div>
-            <a href="admin_analytics.html" class="logout-btn" style="background: #10b981; margin-right: 10px;">📊 Analytics</a>
-            <a href="bulk_actions.html" class="logout-btn" style="background: #f59e0b; margin-right: 10px;">⚡ Bulk Actions</a>
-            <a href="#" class="logout-btn" style="background: #6366f1; margin-right: 10px;">📥 Export</a>
-            <a href="admin_register.html" class="logout-btn" style="background: #8b5cf6; margin-right: 10px;">👤 Add Admin</a>
             <span style="margin-right: 15px;">Welcome, Admin</span>
             <a href="index.html" class="logout-btn">Logout</a>
         </div>
@@ -59,39 +55,6 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
-            <div class="card" style="flex: 1;">
-                <h4>Quick Actions</h4>
-                <div style="display: flex; flex-direction: column; gap: 10px;">
-                    <a href="admin_analytics.html" class="btn btn-primary">📊 View Analytics</a>
-                    <a href="#" class="btn" style="background: #f59e0b; color: white;">📥 Export Data</a>
-                    <a href="admin_register.html" class="btn" style="background: #8b5cf6; color: white;">👤 Add Admin</a>
-                    <button class="btn" style="background: #10b981; color: white;" onclick="refreshData()">🔄 Refresh</button>
-                </div>
-            </div>
-            <div class="card" style="flex: 2;">
-                <h4>System Status</h4>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div>
-                        <strong>Response Rate:</strong><br>
-                        <span style="color: #10b981;">60.5%</span>
-                    </div>
-                    <div>
-                        <strong>Active Users:</strong><br>
-                        <span style="color: #2563eb;">43</span>
-                    </div>
-                    <div>
-                        <strong>Categories:</strong><br>
-                        <span style="color: #f59e0b;">5</span>
-                    </div>
-                    <div>
-                        <strong>This Month:</strong><br>
-                        <span style="color: #8b5cf6;">32</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h3>User Feedback</h3>
@@ -102,7 +65,6 @@
                     <select id="statusFilter" onchange="filterFeedback()" style="padding: 5px; margin-right: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="all">All Status</option>
                         <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
                         <option value="resolved">Resolved</option>
                     </select>
                     <select id="categoryFilter" onchange="filterFeedback()" style="padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
@@ -132,193 +94,50 @@
                 </tbody>
             </table>
         </div>
-    </div>tn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(4)">👁️ View</button>
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
-                        </td>
-                    </tr>
-                    <tr data-content="Excellent service from start to finish. The delivery was on time, packaging was perfect, and the product quality exceeded my expectations. Will definitely recommend to friends and family.">
-                        <td>maria_gonzalez</td>
-                        <td>Outstanding Service Experience</td>
-                        <td>Service</td>
-                        <td>⭐ 5/5</td>
-                        <td><span class="badge badge-resolved">Resolved</span></td>
-                        <td>2024-01-14</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="showResponse(5)">💬 Respond</button>
-                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(5)">👁️ View</button>
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
-                        </td>
-                    </tr>
-                    <tr data-content="The website search function needs improvement. When I search for specific products, irrelevant results appear first. Also, the filter options are limited and don't help narrow down results effectively.">
-                        <td>thomas_anderson</td>
-                        <td>Search Functionality Issues</td>
-                        <td>Website</td>
-                        <td>⭐ 3/5</td>
-                        <td><span class="badge badge-pending">Pending</span></td>
-                        <td>2024-01-13</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="showResponse(6)">💬 Respond</button>
-                            <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(6)">👁️ View</button>
-                            <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this feedback?')">🗑️ Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Response Modal -->
-    <div id="responseModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; width: 400px;">
-            <h3>Respond to Feedback</h3>
-            <form id="responseForm" method="post">
-                <textarea name="response" placeholder="Enter your response..." style="width: 100%; height: 100px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;"></textarea>
-                <select name="status" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="resolved">Resolved</option>
-                </select>
-                <div style="text-align: right;">
-                    <button type="button" onclick="closeResponse()" class="btn" style="background: #6b7280; color: white; margin-right: 10px;">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Response</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <script>
-        function showResponse(feedbackId) {
-            document.getElementById('responseForm').action = '#';
-            document.getElementById('responseModal').style.display = 'block';
-        }
-
-        function closeResponse() {
-            document.getElementById('responseModal').style.display = 'none';
-        }
-
-        function viewDetails(feedbackId) {
-            // Find feedback details and show in alert (simple implementation)
-            const row = event.target.closest('tr');
-            const title = row.cells[1].textContent;
-            const content = row.getAttribute('data-content') || 'Content not available';
-            alert('Feedback Details:\n\nTitle: ' + title + '\nContent: ' + content);
-        }
-
-        function filterFeedback() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            const rows = document.querySelectorAll('tbody tr');
+        function loadUsers() {
+            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            const users = [...new Set(allFeedback.map(f => f.username).filter(u => u && u !== 'undefined'))];
+            const userSelect = document.getElementById('userFilter');
             
-            rows.forEach(row => {
-                const status = row.cells[4].textContent.toLowerCase();
-                const category = row.cells[2].textContent;
-                
-                const statusMatch = statusFilter === 'all' || status.includes(statusFilter);
-                const categoryMatch = categoryFilter === 'all' || category === categoryFilter;
-                
-                row.style.display = (statusMatch && categoryMatch) ? '' : 'none';
+            userSelect.innerHTML = '<option value="">Select User</option>';
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user;
+                option.textContent = user;
+                userSelect.appendChild(option);
             });
         }
-
-        function refreshData() {
-            loadAllFeedback();
-        }
         
-        // Load all feedback for admin dashboard
-        window.addEventListener('DOMContentLoaded', function() {
-            loadAllFeedback();
-        });
-        
-        function loadAllFeedback() {
-            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            const tbody = document.querySelector('.table tbody');
-            
-            // Calculate admin stats
-            const totalFeedback = allFeedback.length;
-            const resolvedCount = allFeedback.filter(f => f.status === 'resolved').length;
-            const pendingCount = allFeedback.filter(f => f.status === 'pending').length;
-            const avgRating = totalFeedback > 0 ? (allFeedback.reduce((sum, f) => sum + f.rating, 0) / totalFeedback).toFixed(1) : 0;
-            
-            // Update admin stats
-            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = totalFeedback;
-            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = resolvedCount;
-            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = pendingCount;
-            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = avgRating;
-            
-            // Clear and populate feedback table
-            tbody.innerHTML = '';
-            
-            if (allFeedback.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
-                            <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
-                            <div style="font-size: 18px;">No feedback received yet</div>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                allFeedback.reverse().forEach(item => {
-                    const statusClass = item.status === 'resolved' ? 'badge-resolved' : 'badge-pending';
-                    const statusText = item.status === 'resolved' ? 'Resolved' : 'Pending';
-                    const shortContent = item.content.length > 50 ? item.content.substring(0, 50) + '...' : item.content;
-                    
-                    tbody.innerHTML += `
-                        <tr data-content="${item.content.replace(/"/g, '&quot;').replace(/\n/g, ' ')}">
-                            <td>${item.user}</td>
-                            <td>${item.title}</td>
-                            <td>${item.category}</td>
-                            <td>⭐ ${item.rating}/5</td>
-                            <td><span class="badge ${statusClass}">${statusText}</span></td>
-                            <td>${item.date}</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" onclick="showResponse(${item.id})">💬 Respond</button>
-                                <button class="btn btn-sm" style="background: #10b981; color: white; margin: 0 2px;" onclick="viewDetails(${item.id})">👁️ View</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteFeedback(${item.id})">🗑️ Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-        }
-        
-        function deleteFeedback(feedbackId) {
-            if (confirm('Delete this feedback?')) {
-                let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-                allFeedback = allFeedback.filter(f => f.id !== feedbackId);
-                localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-                
-                // Also remove from user's personal feedback
-                const feedbackToDelete = allFeedback.find(f => f.id === feedbackId);
-                if (feedbackToDelete) {
-                    const userFeedbackKey = 'feedback_' + feedbackToDelete.user;
-                    let userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
-                    userFeedback = userFeedback.filter(f => f.id !== feedbackId);
-                    localStorage.setItem(userFeedbackKey, JSON.stringify(userFeedback));
-                }
-                
-                loadAllFeedback();
-            }
-        }
-    </script>
-    <script>
-        function loadAllFeedback() {
-            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+        function loadUserFeedback() {
+            const selectedUser = document.getElementById('userFilter').value;
             const tableBody = document.getElementById('feedbackTableBody');
             
-            if (allFeedback.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">No feedback submitted yet</td></tr>';
+            if (!selectedUser) {
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">Select a user to view their feedback</td></tr>';
+                updateStatistics([]);
+                return;
+            }
+            
+            const userFeedbackKey = `feedback_${selectedUser}`;
+            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+            
+            if (userFeedback.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">${selectedUser} has not submitted any feedback yet</td></tr>`;
+                updateStatistics([]);
                 return;
             }
             
             tableBody.innerHTML = '';
-            allFeedback.forEach(feedback => {
+            userFeedback.forEach(feedback => {
                 const row = document.createElement('tr');
                 const statusClass = feedback.status === 'resolved' ? 'badge-resolved' : 'badge-pending';
                 const stars = '⭐'.repeat(feedback.rating);
                 
                 row.innerHTML = `
-                    <td>${feedback.username}</td>
+                    <td>${selectedUser}</td>
                     <td>${feedback.title}</td>
                     <td>${feedback.category}</td>
                     <td>${stars} ${feedback.rating}/5</td>
@@ -332,14 +151,15 @@
                 `;
                 tableBody.appendChild(row);
             });
+            
+            updateStatistics(userFeedback);
         }
         
-        function updateStatistics() {
-            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            const total = allFeedback.length;
-            const resolved = allFeedback.filter(f => f.status === 'resolved').length;
+        function updateStatistics(feedback) {
+            const total = feedback.length;
+            const resolved = feedback.filter(f => f.status === 'resolved').length;
             const pending = total - resolved;
-            const avgRating = total > 0 ? (allFeedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1) : 0;
+            const avgRating = total > 0 ? (feedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1) : 0;
             
             document.getElementById('totalFeedback').textContent = total;
             document.getElementById('resolvedFeedback').textContent = resolved;
@@ -350,36 +170,64 @@
         function deleteFeedback(feedbackId) {
             if (!confirm('Delete this feedback?')) return;
             
-            // Remove from admin view
-            let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            const feedbackToDelete = allFeedback.find(f => f.id === feedbackId);
-            allFeedback = allFeedback.filter(f => f.id !== feedbackId);
-            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+            const selectedUser = document.getElementById('userFilter').value;
+            if (!selectedUser) return;
             
             // Remove from user's personal feedback
-            if (feedbackToDelete) {
-                const userKey = `feedback_${feedbackToDelete.username}`;
-                let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-                userFeedback = userFeedback.filter(f => f.id !== feedbackId);
-                localStorage.setItem(userKey, JSON.stringify(userFeedback));
-            }
+            const userKey = `feedback_${selectedUser}`;
+            let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
+            userFeedback = userFeedback.filter(f => f.id != feedbackId);
+            localStorage.setItem(userKey, JSON.stringify(userFeedback));
             
-            loadAllFeedback();
-            updateStatistics();
+            // Remove from admin view
+            let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            allFeedback = allFeedback.filter(f => f.id != feedbackId);
+            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+            
+            loadUserFeedback();
         }
         
         function showResponse(feedbackId) {
-            const response = prompt('Enter your response:');
-            if (response) {
-                alert('Response sent successfully!');
+            const response = prompt('Enter your response to this feedback:');
+            if (response && response.trim()) {
+                const selectedUser = document.getElementById('userFilter').value;
+                if (!selectedUser) return;
+                
+                // Update user's feedback
+                const userKey = `feedback_${selectedUser}`;
+                let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
+                const feedbackIndex = userFeedback.findIndex(f => f.id == feedbackId);
+                if (feedbackIndex !== -1) {
+                    userFeedback[feedbackIndex].response = response;
+                    userFeedback[feedbackIndex].status = 'resolved';
+                    localStorage.setItem(userKey, JSON.stringify(userFeedback));
+                }
+                
+                // Update admin feedback
+                let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+                const adminFeedbackIndex = allFeedback.findIndex(f => f.id == feedbackId);
+                if (adminFeedbackIndex !== -1) {
+                    allFeedback[adminFeedbackIndex].response = response;
+                    allFeedback[adminFeedbackIndex].status = 'resolved';
+                    localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+                }
+                
+                alert('Response sent successfully! Feedback status updated to resolved.');
+                loadUserFeedback();
             }
         }
         
         function viewDetails(feedbackId) {
-            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            const feedback = allFeedback.find(f => f.id === feedbackId);
+            const selectedUser = document.getElementById('userFilter').value;
+            if (!selectedUser) return;
+            
+            const userKey = `feedback_${selectedUser}`;
+            const userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
+            const feedback = userFeedback.find(f => f.id == feedbackId);
+            
             if (feedback) {
-                alert(`Feedback Details:\n\nTitle: ${feedback.title}\nUser: ${feedback.username}\nCategory: ${feedback.category}\nRating: ${feedback.rating}/5\nContent: ${feedback.content}\nDate: ${feedback.date}`);
+                const responseText = feedback.response && feedback.response !== 'No response' ? feedback.response : 'No response yet';
+                alert(`Feedback Details:\n\nTitle: ${feedback.title}\nUser: ${selectedUser}\nCategory: ${feedback.category}\nRating: ${feedback.rating}/5\nStatus: ${feedback.status}\nDate: ${feedback.date}\n\nContent:\n${feedback.content}\n\nAdmin Response:\n${responseText}`);
             }
         }
         
@@ -403,14 +251,13 @@
         }
         
         function refreshData() {
-            loadAllFeedback();
-            updateStatistics();
+            loadUsers();
+            loadUserFeedback();
         }
         
         // Load data on page load
         document.addEventListener('DOMContentLoaded', function() {
-            loadAllFeedback();
-            updateStatistics();
+            loadUsers();
         });
     </script>
 </body>
