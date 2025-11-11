@@ -19,6 +19,7 @@
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-resolved { background: #d1fae5; color: #065f46; }
+        .badge-in-progress { background: #dbeafe; color: #1e40af; }
         .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
         .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s ease; }
         .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transition: all 0.3s ease; }
@@ -89,9 +90,30 @@
                     </tr>
                 </thead>
                 <tbody id="feedbackTableBody">
-                    <tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">Select a user to view their feedback</td></tr>
+                    <tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">Loading feedback...</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Response Modal -->
+    <div id="responseModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; width: 500px; max-width: 90%;">
+            <h3 style="margin-top: 0;">💬 Respond to Feedback</h3>
+            <div id="feedbackInfo" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
+            <textarea id="responseText" placeholder="Enter your response..." style="width: 100%; height: 120px; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 15px; resize: vertical;"></textarea>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600;">Update Status:</label>
+                <select id="statusSelect" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                    <option value="pending">⏳ Pending</option>
+                    <option value="in_progress">🔄 In Progress</option>
+                    <option value="resolved">✅ Resolved</option>
+                </select>
+            </div>
+            <div style="text-align: right;">
+                <button onclick="closeResponseModal()" style="padding: 10px 20px; margin-right: 10px; border: 2px solid #6b7280; background: white; color: #6b7280; border-radius: 8px; cursor: pointer;">Cancel</button>
+                <button onclick="submitResponse()" style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; cursor: pointer;">Send Response</button>
+            </div>
         </div>
     </div>
 
@@ -99,12 +121,26 @@
         function debugStorage() {
             const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
             console.log('All Feedback:', allFeedback);
-            alert(`Found ${allFeedback.length} feedback entries in storage`);
+            
+            // Also check individual user feedback
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('feedback_'));
+            console.log('User feedback keys:', keys);
+            
+            let totalUserFeedback = 0;
+            keys.forEach(key => {
+                const userFeedback = JSON.parse(localStorage.getItem(key) || '[]');
+                console.log(key + ':', userFeedback);
+                totalUserFeedback += userFeedback.length;
+            });
+            
+            alert(`Found ${allFeedback.length} feedback entries in allFeedback\nFound ${totalUserFeedback} total entries in user-specific storage\nUser keys: ${keys.join(', ')}`);
         }
         
         function loadAllFeedback() {
             const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
             const tableBody = document.getElementById('feedbackTableBody');
+            
+            console.log('Loading feedback:', allFeedback);
             
             if (allFeedback.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: #6b7280;">No feedback submitted yet</td></tr>';
@@ -115,7 +151,9 @@
             tableBody.innerHTML = '';
             allFeedback.forEach(feedback => {
                 const row = document.createElement('tr');
-                const statusClass = feedback.status === 'resolved' ? 'badge-resolved' : 'badge-pending';
+                let statusClass = 'badge-pending';
+                if (feedback.status === 'resolved') statusClass = 'badge-resolved';
+                else if (feedback.status === 'in_progress') statusClass = 'badge-in-progress';
                 const stars = '⭐'.repeat(feedback.rating);
                 const username = feedback.user || feedback.username || 'Unknown';
                 
@@ -124,7 +162,7 @@
                     <td>${feedback.title}</td>
                     <td>${feedback.category}</td>
                     <td>${stars} ${feedback.rating}/5</td>
-                    <td><span class="badge ${statusClass}">${feedback.status}</span></td>
+                    <td><span class="badge ${statusClass}">${feedback.status.replace('_', ' ')}</span></td>
                     <td>${feedback.date}</td>
                     <td>
                         <button class="btn btn-primary btn-sm" onclick="showResponse('${feedback.id}', '${username}')">💬 Respond</button>
@@ -167,31 +205,79 @@
             loadAllFeedback();
         }
         
+        let currentFeedbackId = null;
+        let currentUsername = null;
+        
         function showResponse(feedbackId, username) {
-            const response = prompt('Enter your response to this feedback:');
-            if (response && response.trim()) {
-                // Update admin feedback
-                let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-                const adminFeedbackIndex = allFeedback.findIndex(f => f.id == feedbackId);
-                if (adminFeedbackIndex !== -1) {
-                    allFeedback[adminFeedbackIndex].response = response;
-                    allFeedback[adminFeedbackIndex].status = 'resolved';
-                    localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-                }
-                
-                // Update user's feedback
-                const userKey = `feedback_${username}`;
-                let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-                const feedbackIndex = userFeedback.findIndex(f => f.id == feedbackId);
-                if (feedbackIndex !== -1) {
-                    userFeedback[feedbackIndex].response = response;
-                    userFeedback[feedbackIndex].status = 'resolved';
-                    localStorage.setItem(userKey, JSON.stringify(userFeedback));
-                }
-                
-                alert('Response sent successfully! Feedback status updated to resolved.');
-                loadAllFeedback();
+            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            const feedback = allFeedback.find(f => f.id == feedbackId);
+            
+            if (!feedback) {
+                alert('Feedback not found!');
+                return;
             }
+            
+            currentFeedbackId = feedbackId;
+            currentUsername = username;
+            
+            // Populate modal with feedback info
+            document.getElementById('feedbackInfo').innerHTML = `
+                <strong>Title:</strong> ${feedback.title}<br>
+                <strong>User:</strong> ${username}<br>
+                <strong>Category:</strong> ${feedback.category}<br>
+                <strong>Rating:</strong> ${'⭐'.repeat(feedback.rating)} ${feedback.rating}/5<br>
+                <strong>Content:</strong> ${feedback.content}
+            `;
+            
+            // Set current status
+            document.getElementById('statusSelect').value = feedback.status;
+            
+            // Clear previous response
+            document.getElementById('responseText').value = '';
+            
+            // Show modal
+            document.getElementById('responseModal').style.display = 'block';
+        }
+        
+        function closeResponseModal() {
+            document.getElementById('responseModal').style.display = 'none';
+            currentFeedbackId = null;
+            currentUsername = null;
+        }
+        
+        function submitResponse() {
+            const response = document.getElementById('responseText').value.trim();
+            const status = document.getElementById('statusSelect').value;
+            
+            if (!response) {
+                alert('Please enter a response.');
+                return;
+            }
+            
+            // Update admin feedback
+            let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            const adminFeedbackIndex = allFeedback.findIndex(f => f.id == currentFeedbackId);
+            if (adminFeedbackIndex !== -1) {
+                allFeedback[adminFeedbackIndex].response = response;
+                allFeedback[adminFeedbackIndex].status = status;
+                allFeedback[adminFeedbackIndex].responseDate = new Date().toLocaleDateString();
+                localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+            }
+            
+            // Update user's feedback
+            const userKey = `feedback_${currentUsername}`;
+            let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
+            const feedbackIndex = userFeedback.findIndex(f => f.id == currentFeedbackId);
+            if (feedbackIndex !== -1) {
+                userFeedback[feedbackIndex].response = response;
+                userFeedback[feedbackIndex].status = status;
+                userFeedback[feedbackIndex].responseDate = new Date().toLocaleDateString();
+                localStorage.setItem(userKey, JSON.stringify(userFeedback));
+            }
+            
+            alert(`Response sent successfully!\nStatus updated to: ${status.replace('_', ' ')}\nUser will be notified of your response.`);
+            closeResponseModal();
+            loadAllFeedback();
         }
         
         function viewDetails(feedbackId) {
@@ -230,207 +316,8 @@
         
         // Load data on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, loading feedback...');
             loadAllFeedback();
-        });resolved;
-            const avgRating = total > 0 ? (feedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1) : 0;
-            
-            document.getElementById('totalFeedback').textContent = total;
-            document.getElementById('resolvedFeedback').textContent = resolved;
-            document.getElementById('pendingFeedback').textContent = pending;
-            document.getElementById('avgRating').textContent = avgRating;
-        }
-        
-        function deleteFeedback(feedbackId) {
-            if (!confirm('Delete this feedback?')) return;
-            
-            const selectedUser = document.getElementById('userFilter').value;
-            if (!selectedUser) return;
-            
-            // Remove from user's personal feedback
-            const userKey = `feedback_${selectedUser}`;
-            let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-            userFeedback = userFeedback.filter(f => f.id != feedbackId);
-            localStorage.setItem(userKey, JSON.stringify(userFeedback));
-            
-            // Remove from admin view
-            let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            allFeedback = allFeedback.filter(f => f.id != feedbackId);
-            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-            
-            loadUserFeedback();
-        }
-        
-        function showResponse(feedbackId) {
-            const response = prompt('Enter your response to this feedback:');
-            if (response && response.trim()) {
-                const selectedUser = document.getElementById('userFilter').value;
-                if (!selectedUser) return;
-                
-                // Update user's feedback
-                const userKey = `feedback_${selectedUser}`;
-                let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-                const feedbackIndex = userFeedback.findIndex(f => f.id == feedbackId);
-                if (feedbackIndex !== -1) {
-                    userFeedback[feedbackIndex].response = response;
-                    userFeedback[feedbackIndex].status = 'resolved';
-                    localStorage.setItem(userKey, JSON.stringify(userFeedback));
-                }
-                
-                // Update admin feedback
-                let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-                const adminFeedbackIndex = allFeedback.findIndex(f => f.id == feedbackId);
-                if (adminFeedbackIndex !== -1) {
-                    allFeedback[adminFeedbackIndex].response = response;
-                    allFeedback[adminFeedbackIndex].status = 'resolved';
-                    localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-                }
-                
-                alert('Response sent successfully! Feedback status updated to resolved.');
-                loadUserFeedback();
-            }
-        }
-        
-        function viewDetails(feedbackId) {
-            const selectedUser = document.getElementById('userFilter').value;
-            if (!selectedUser) return;
-            
-            const userKey = `feedback_${selectedUser}`;
-            const userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-            const feedback = userFeedback.find(f => f.id == feedbackId);
-            
-            if (feedback) {
-                const responseText = feedback.response && feedback.response !== 'No response' ? feedback.response : 'No response yet';
-                alert(`Feedback Details:\n\nTitle: ${feedback.title}\nUser: ${selectedUser}\nCategory: ${feedback.category}\nRating: ${feedback.rating}/5\nStatus: ${feedback.status}\nDate: ${feedback.date}\n\nContent:\n${feedback.content}\n\nAdmin Response:\n${responseText}`);
-            }
-        }
-        
-        function filterFeedback() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            const rows = document.querySelectorAll('#feedbackTableBody tr');
-            
-            rows.forEach(row => {
-                const cells = row.cells;
-                if (cells.length < 7) return;
-                
-                const category = cells[2].textContent;
-                const status = cells[4].textContent.toLowerCase();
-                
-                const statusMatch = statusFilter === 'all' || status.includes(statusFilter);
-                const categoryMatch = categoryFilter === 'all' || category === categoryFilter;
-                
-                row.style.display = statusMatch && categoryMatch ? '' : 'none';
-            });
-        }
-        
-        function refreshData() {
-            loadUsers();
-            loadUserFeedback();
-        }
-        
-        // Load data on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUsers();
-        });l - resolved;
-            const avgRating = total > 0 ? (feedback.reduce((sum, f) => sum + f.rating, 0) / total).toFixed(1) : 0;
-            
-            document.getElementById('totalFeedback').textContent = total;
-            document.getElementById('resolvedFeedback').textContent = resolved;
-            document.getElementById('pendingFeedback').textContent = pending;
-            document.getElementById('avgRating').textContent = avgRating;
-        }
-        
-        function deleteFeedback(feedbackId) {
-            if (!confirm('Delete this feedback?')) return;
-            
-            const selectedUser = document.getElementById('userFilter').value;
-            if (!selectedUser) return;
-            
-            // Remove from user's personal feedback
-            const userKey = `feedback_${selectedUser}`;
-            let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-            userFeedback = userFeedback.filter(f => f.id != feedbackId);
-            localStorage.setItem(userKey, JSON.stringify(userFeedback));
-            
-            // Remove from admin view
-            let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            allFeedback = allFeedback.filter(f => f.id != feedbackId);
-            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-            
-            loadUserFeedback();
-        }
-        
-        function showResponse(feedbackId) {
-            const response = prompt('Enter your response to this feedback:');
-            if (response && response.trim()) {
-                const selectedUser = document.getElementById('userFilter').value;
-                if (!selectedUser) return;
-                
-                // Update user's feedback
-                const userKey = `feedback_${selectedUser}`;
-                let userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-                const feedbackIndex = userFeedback.findIndex(f => f.id == feedbackId);
-                if (feedbackIndex !== -1) {
-                    userFeedback[feedbackIndex].response = response;
-                    userFeedback[feedbackIndex].status = 'resolved';
-                    localStorage.setItem(userKey, JSON.stringify(userFeedback));
-                }
-                
-                // Update admin feedback
-                let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-                const adminFeedbackIndex = allFeedback.findIndex(f => f.id == feedbackId);
-                if (adminFeedbackIndex !== -1) {
-                    allFeedback[adminFeedbackIndex].response = response;
-                    allFeedback[adminFeedbackIndex].status = 'resolved';
-                    localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-                }
-                
-                alert('Response sent successfully! Feedback status updated to resolved.');
-                loadUserFeedback();
-            }
-        }
-        
-        function viewDetails(feedbackId) {
-            const selectedUser = document.getElementById('userFilter').value;
-            if (!selectedUser) return;
-            
-            const userKey = `feedback_${selectedUser}`;
-            const userFeedback = JSON.parse(localStorage.getItem(userKey) || '[]');
-            const feedback = userFeedback.find(f => f.id == feedbackId);
-            
-            if (feedback) {
-                const responseText = feedback.response && feedback.response !== 'No response' ? feedback.response : 'No response yet';
-                alert(`Feedback Details:\n\nTitle: ${feedback.title}\nUser: ${selectedUser}\nCategory: ${feedback.category}\nRating: ${feedback.rating}/5\nStatus: ${feedback.status}\nDate: ${feedback.date}\n\nContent:\n${feedback.content}\n\nAdmin Response:\n${responseText}`);
-            }
-        }
-        
-        function filterFeedback() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const categoryFilter = document.getElementById('categoryFilter').value;
-            const rows = document.querySelectorAll('#feedbackTableBody tr');
-            
-            rows.forEach(row => {
-                const cells = row.cells;
-                if (cells.length < 7) return;
-                
-                const category = cells[2].textContent;
-                const status = cells[4].textContent.toLowerCase();
-                
-                const statusMatch = statusFilter === 'all' || status.includes(statusFilter);
-                const categoryMatch = categoryFilter === 'all' || category === categoryFilter;
-                
-                row.style.display = statusMatch && categoryMatch ? '' : 'none';
-            });
-        }
-        
-        function refreshData() {
-            loadUsers();
-            loadUserFeedback();
-        }
-        
-        // Load data on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUsers();
         });
     </script>
 </body>
