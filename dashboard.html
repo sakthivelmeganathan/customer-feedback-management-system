@@ -171,49 +171,43 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase configuration
-        const supabaseUrl = 'https://pccyeoeuzfqbcdkhmjqj.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjY3llb2V1emZxYmNka2htanFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTYzMjIsImV4cCI6MjA4NDM5MjMyMn0.O3RVMDDdcQlZA1W5uml0C2wzgo2ed_ECScHCLq41qzM';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // Check if user is logged in
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (!currentUser.username) {
+            alert('Please log in first');
+            window.location.href = 'user_login.html';
+        }
         
-        window.onload = async function() {
+        // Ensure this is not an admin
+        if (currentUser.isAdmin === true) {
+            window.location.href = 'admin_dashboard.html';
+        }
+        
+        window.onload = function() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const username = currentUser.username || 'User';
             document.getElementById('username').textContent = username;
             
-            try {
-                // Load user-specific feedback from Supabase
-                const { data, error } = await supabase
-                    .from('shared_data')
-                    .select('data_value')
-                    .eq('data_key', `feedback_${username}`)
-                    .single();
-                
-                const userFeedback = data && data.data_value ? data.data_value : [];
-                
-                // Calculate stats from actual user feedback
-                const stats = {
-                    total: userFeedback.length,
-                    resolved: userFeedback.filter(f => f.status === 'resolved').length,
-                    pending: userFeedback.filter(f => f.status === 'pending').length,
-                    avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
-                };
-                
-                // Update stats display
-                document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = stats.total;
-                document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stats.resolved;
-                document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stats.pending;
-                document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = stats.avgRating;
-                
-                // Update feedback table with user's actual feedback
-                displayUserFeedback(userFeedback);
-            } catch (error) {
-                console.error('Error loading feedback:', error);
-                // Fallback to empty state
-                displayUserFeedback([]);
-            }
+            // Load user feedback from localStorage
+            const userFeedback = JSON.parse(localStorage.getItem('feedback_' + username) || '[]');
+            
+            // Calculate stats
+            const stats = {
+                total: userFeedback.length,
+                resolved: userFeedback.filter(f => f.status === 'resolved').length,
+                pending: userFeedback.filter(f => f.status === 'pending').length,
+                avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
+            };
+            
+            // Update stats display
+            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = stats.total;
+            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stats.resolved;
+            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stats.pending;
+            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = stats.avgRating;
+            
+            // Update feedback table
+            displayUserFeedback(userFeedback);
         };
         
         function displayUserFeedback(userFeedback) {
