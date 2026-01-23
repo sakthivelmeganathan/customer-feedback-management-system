@@ -88,8 +88,10 @@
         </div>
     </div>
 
-    <script>
-        function handleRegistration(event) {
+    <script type="module">
+        import { db } from '../supabase-config.js';
+        
+        window.handleRegistration = async function(event) {
             event.preventDefault();
             
             const username = document.getElementById('username').value;
@@ -103,19 +105,24 @@
                 return false;
             }
             
-            // Simple validation
             if (username && email && password && regCode) {
-                // Store user data in localStorage (demo purposes)
                 const userData = {
+                    id: 'user-' + Date.now(),
                     username: username,
                     email: email,
                     password: password,
                     created: new Date().toISOString()
                 };
                 
-                localStorage.setItem('user_' + username, JSON.stringify(userData));
-                alert('Registration successful! You can now login with your credentials.');
-                window.location.href = 'user_login.html';
+                try {
+                    // Store user in Supabase shared memory
+                    await db.setSharedData(`user_${username}`, userData);
+                    alert('Registration successful! You can now login with your credentials.');
+                    window.location.href = 'user_login.html';
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    alert('Registration failed. Please try again.');
+                }
             } else {
                 alert('Please fill in all fields');
             }
