@@ -88,9 +88,11 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Fallback for GitHub Pages without Supabase
-        const isGitHubPages = window.location.hostname.includes('github.io');
+        const supabaseUrl = 'https://pccyeoeuzfqbcdkhmjqj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjY3llb2V1emZxYmNka2htanFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTYzMjIsImV4cCI6MjA4NDM5MjMyMn0.O3RVMDDdcQlZA1W5uml0C2wzgo2ed_ECScHCLq41qzM';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         window.handleRegistration = async function(event) {
             event.preventDefault();
@@ -100,7 +102,6 @@
             const password = document.getElementById('password').value;
             const regCode = document.getElementById('registration_code').value;
             
-            // Validate registration code
             if (regCode !== 'USER123') {
                 alert('Invalid registration code. Please enter USER123');
                 return false;
@@ -115,22 +116,18 @@
                     created: new Date().toISOString()
                 };
                 
-                if (isGitHubPages) {
-                    // Use localStorage for GitHub Pages
-                    localStorage.setItem(`user_${username}`, JSON.stringify(userData));
-                } else {
-                    // Use Supabase for local development
-                    try {
-                        const { db } = await import('../supabase-config.js');
-                        await db.setSharedData(`user_${username}`, userData);
-                    } catch (error) {
-                        console.error('Supabase error, falling back to localStorage:', error);
-                        localStorage.setItem(`user_${username}`, JSON.stringify(userData));
-                    }
+                try {
+                    // Store user in Supabase shared memory
+                    await supabase
+                        .from('shared_data')
+                        .upsert([{ data_key: `user_${username}`, data_value: userData }]);
+                    
+                    alert('Registration successful! You can now login with your credentials.');
+                    window.location.href = 'user_login.html';
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    alert('Registration failed. Please try again.');
                 }
-                
-                alert('Registration successful! You can now login with your credentials.');
-                window.location.href = 'user_login.html';
             } else {
                 alert('Please fill in all fields');
             }
