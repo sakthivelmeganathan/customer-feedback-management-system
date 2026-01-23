@@ -28,6 +28,10 @@
         .status-pending { background: #fef3c7; color: #92400e; }
         .status-resolved { background: #d1fae5; color: #065f46; }
         .logout-btn { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); transition: all 0.3s ease; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-close { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
     </style>
     <link rel="icon" href="data:,">
 </head>
@@ -139,6 +143,34 @@
         </div>
     </div>
 
+    <!-- Response Modal -->
+    <div id="responseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 Admin Response</h3>
+                <button onclick="closeResponseModal()" class="modal-close">✕</button>
+            </div>
+            <div id="responseContent"></div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🗑️ Delete Feedback</h3>
+                <button onclick="closeDeleteModal()" class="modal-close">✕</button>
+            </div>
+            <div id="deleteContent">
+                <p>Are you sure you want to delete this feedback?</p>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button onclick="closeDeleteModal()" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 10px;">Cancel</button>
+                    <button onclick="confirmDelete()" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // User-specific data
         const userData = {
@@ -168,7 +200,8 @@
         };
 
         window.onload = function() {
-            const username = localStorage.getItem('currentUser') || 'User';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
             document.getElementById('username').textContent = username;
             
             // Load user-specific feedback from localStorage
@@ -207,30 +240,49 @@
                     </tr>
                 `;
             } else {
-                userFeedback.reverse().forEach(item => {
+                userFeedback.reverse().slice(0, 5).forEach(item => {
                     const statusClass = item.status === 'resolved' ? 'status-resolved' : 'status-pending';
                     const statusIcon = item.status === 'resolved' ? '✅ Resolved' : '⏳ Pending';
                     const shortContent = item.content.length > 50 ? item.content.substring(0, 50) + '...' : item.content;
+                    
+                    const responseDisplay = item.response && item.response !== 'No response' 
+                        ? `<button onclick="viewResponse('${item.id}')" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">💬 View Response</button>`
+                        : 'No response yet';
+                    
+                    const deleteButton = (!item.response || item.response === 'No response') 
+                        ? `<button onclick="deleteFeedback('${item.id}')" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-left: 5px;">🗑️ Delete</button>`
+                        : '';
                     
                     tbody.innerHTML += `
                         <tr>
                             <td>
                                 <div style="font-weight: 600;">${item.title}</div>
-                                <div style="color: #666; font-size: 14px;">${shortContent}</div>
+                                <div style="color: #666; font-size: 14px; cursor: pointer;" onclick="viewFullMessage('${item.id}')">${shortContent}</div>
                             </td>
                             <td>${item.category}</td>
                             <td>⭐ ${item.rating}/5</td>
                             <td><span class="status-badge ${statusClass}">${statusIcon}</span></td>
                             <td>${item.date}</td>
-                            <td>${item.response}</td>
+                            <td>${responseDisplay}${deleteButton}</td>
                         </tr>
                     `;
                 });
+                
+                if (userFeedback.length > 5) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 20px; background: #f8fafc;">
+                                <button onclick="showAllFeedback()" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">View All ${userFeedback.length} Feedback</button>
+                            </td>
+                        </tr>
+                    `;
+                }
             }
         };
 
         function showFeedbackHistory() {
-            const username = localStorage.getItem('currentUser') || 'User';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
             const userFeedback = JSON.parse(localStorage.getItem('feedback_' + username) || '[]');
             alert(`${username}'s complete feedback history: ${userFeedback.length} total submissions`);
         }
@@ -245,6 +297,125 @@
         function filterFeedback() {
             const filter = document.getElementById('statusFilter').value;
             alert('Filtering feedback by: ' + filter);
+        }
+        
+        function viewResponse(feedbackId) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
+            const userFeedback = JSON.parse(localStorage.getItem('feedback_' + username) || '[]');
+            const feedback = userFeedback.find(f => f.id == feedbackId);
+            
+            if (feedback && feedback.response && feedback.response !== 'No response') {
+                document.getElementById('responseContent').innerHTML = `
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 15px;">
+                        <h4>${feedback.title}</h4>
+                        <p><strong>Status:</strong> ${feedback.status}</p>
+                        <p><strong>Date:</strong> ${feedback.date}</p>
+                    </div>
+                    <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; border-left: 4px solid #0288d1;">
+                        <strong>Admin Response:</strong><br>
+                        ${feedback.response}
+                    </div>
+                `;
+                document.getElementById('responseModal').style.display = 'block';
+            } else {
+                alert('No response available yet.');
+            }
+        }
+        
+        function closeResponseModal() {
+            document.getElementById('responseModal').style.display = 'none';
+        }
+        
+        function showAllFeedback() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
+            const userFeedback = JSON.parse(localStorage.getItem('feedback_' + username) || '[]');
+            
+            const tbody = document.querySelector('.table tbody');
+            tbody.innerHTML = '';
+            
+            userFeedback.reverse().forEach(item => {
+                const statusClass = item.status === 'resolved' ? 'status-resolved' : 'status-pending';
+                const statusIcon = item.status === 'resolved' ? '✅ Resolved' : '⏳ Pending';
+                const shortContent = item.content.length > 50 ? item.content.substring(0, 50) + '...' : item.content;
+                
+                const responseDisplay = item.response && item.response !== 'No response' 
+                    ? `<button onclick="viewResponse('${item.id}')" style="background: #10b981; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">💬 View Response</button>`
+                    : 'No response yet';
+                
+                const deleteButton = (!item.response || item.response === 'No response') 
+                    ? `<button onclick="deleteFeedback('${item.id}')" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-left: 5px;">🗑️ Delete</button>`
+                    : '';
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600;">${item.title}</div>
+                            <div style="color: #666; font-size: 14px; cursor: pointer;" onclick="viewFullMessage('${item.id}')">${shortContent}</div>
+                        </td>
+                        <td>${item.category}</td>
+                        <td>⭐ ${item.rating}/5</td>
+                        <td><span class="status-badge ${statusClass}">${statusIcon}</span></td>
+                        <td>${item.date}</td>
+                        <td>${responseDisplay}${deleteButton}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function viewFullMessage(feedbackId) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
+            const userFeedback = JSON.parse(localStorage.getItem('feedback_' + username) || '[]');
+            const feedback = userFeedback.find(f => f.id == feedbackId);
+            
+            if (feedback) {
+                document.getElementById('responseContent').innerHTML = `
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 10px;">
+                        <h4>${feedback.title}</h4>
+                        <p><strong>Category:</strong> ${feedback.category}</p>
+                        <p><strong>Rating:</strong> ⭐ ${feedback.rating}/5</p>
+                        <p><strong>Date:</strong> ${feedback.date}</p>
+                        <div style="background: white; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #667eea;">
+                            <strong>Your Message:</strong><br>
+                            ${feedback.content}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('responseModal').style.display = 'block';
+            }
+        }
+        
+        function deleteFeedback(feedbackId) {
+            window.currentDeleteId = feedbackId;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            window.currentDeleteId = null;
+        }
+        
+        function confirmDelete() {
+            if (!window.currentDeleteId) return;
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
+            
+            // Remove from user's feedback
+            const userFeedbackKey = 'feedback_' + username;
+            let userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+            userFeedback = userFeedback.filter(f => f.id != window.currentDeleteId);
+            localStorage.setItem(userFeedbackKey, JSON.stringify(userFeedback));
+            
+            // Remove from global feedback
+            let allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
+            allFeedback = allFeedback.filter(f => f.id != window.currentDeleteId);
+            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
+            
+            closeDeleteModal();
+            location.reload();
         }
     </script>
 </body>
