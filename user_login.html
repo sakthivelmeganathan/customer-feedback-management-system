@@ -67,6 +67,7 @@
         a:hover { text-decoration: underline; }
         .links { text-align: center; margin-top: 25px; }
         .links p { margin: 10px 0; color: #666; font-size: 14px; }
+        .error-message { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
     </style>
     <link rel="icon" href="data:,">
 </head>
@@ -80,6 +81,7 @@
             <label>Password
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
             </label>
+            <div id="errorMessage" class="error-message">Invalid username or password. Please register first.</div>
             <div class="row">
                 <input type="checkbox" id="remember" name="remember">
                 <label for="remember">Remember me</label>
@@ -93,7 +95,7 @@
     </div>
 
     <script>
-        function handleUserLogin(event) {
+        window.handleUserLogin = async function(event) {
             event.preventDefault();
             
             const username = document.getElementById('username').value;
@@ -105,20 +107,17 @@
             if (userData) {
                 const user = JSON.parse(userData);
                 if (user.password === password) {
-                    localStorage.setItem('currentUser', username);
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: user.id || 'user-' + Date.now(),
+                        username: username,
+                        isAdmin: false
+                    }));
                     window.location.href = 'dashboard.html';
                     return false;
                 }
             }
             
-            // Fallback - accept any credentials
-            if (username && password) {
-                localStorage.setItem('currentUser', username);
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Please enter both username and password');
-            }
-            
+            document.getElementById('errorMessage').style.display = 'block';
             return false;
         }
     </script>
