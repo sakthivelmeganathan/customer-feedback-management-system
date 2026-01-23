@@ -94,8 +94,12 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const isGitHubPages = window.location.hostname.includes('github.io');
+        // Supabase configuration
+        const supabaseUrl = 'https://pccyeoeuzfqbcdkhmjqj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjY3llb2V1emZxYmNka2htanFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTYzMjIsImV4cCI6MjA4NDM5MjMyMn0.O3RVMDDdcQlZA1W5uml0C2wzgo2ed_ECScHCLq41qzM';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         window.handleUserLogin = async function(event) {
             event.preventDefault();
@@ -104,39 +108,24 @@
             const password = document.getElementById('password').value;
             
             try {
-                let userData = null;
+                // Check Supabase shared data for user credentials
+                const { data, error } = await supabase
+                    .from('shared_data')
+                    .select('data_value')
+                    .eq('data_key', `user_${username}`)
+                    .single();
                 
-                if (isGitHubPages) {
-                    // Use localStorage for GitHub Pages
-                    const stored = localStorage.getItem(`user_${username}`);
-                    if (stored) {
-                        userData = JSON.parse(stored);
+                if (data && data.data_value) {
+                    const userData = data.data_value;
+                    if (userData.password === password) {
+                        localStorage.setItem('currentUser', JSON.stringify({
+                            id: userData.id || 'user-' + Date.now(),
+                            username: username,
+                            isAdmin: false
+                        }));
+                        window.location.href = 'dashboard.html';
+                        return false;
                     }
-                } else {
-                    // Use Supabase for local development
-                    try {
-                        const { db } = await import('../supabase-config.js');
-                        const result = await db.getSharedData(`user_${username}`);
-                        if (result.data && result.data.data_value) {
-                            userData = result.data.data_value;
-                        }
-                    } catch (error) {
-                        console.error('Supabase error, falling back to localStorage:', error);
-                        const stored = localStorage.getItem(`user_${username}`);
-                        if (stored) {
-                            userData = JSON.parse(stored);
-                        }
-                    }
-                }
-                
-                if (userData && userData.password === password) {
-                    localStorage.setItem('currentUser', JSON.stringify({
-                        id: userData.id || 'user-' + Date.now(),
-                        username: username,
-                        isAdmin: false
-                    }));
-                    window.location.href = 'dashboard.html';
-                    return false;
                 }
                 
                 document.getElementById('errorMessage').style.display = 'block';
