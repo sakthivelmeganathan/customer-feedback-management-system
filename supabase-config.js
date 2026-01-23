@@ -15,6 +15,42 @@ setupDatabase()
 
 // Database operations
 export const db = {
+    // Admins
+    async createAdmin(adminData) {
+        const { data, error } = await supabase
+            .from('admins')
+            .insert([adminData])
+            .select()
+        return { data, error }
+    },
+
+    async getAdmin(username) {
+        const { data, error } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('username', username)
+            .single()
+        return { data, error }
+    },
+
+    // Shared data
+    async setSharedData(key, value) {
+        const { data, error } = await supabase
+            .from('shared_data')
+            .upsert([{ data_key: key, data_value: value }])
+            .select()
+        return { data, error }
+    },
+
+    async getSharedData(key) {
+        const { data, error } = await supabase
+            .from('shared_data')
+            .select('data_value')
+            .eq('data_key', key)
+            .single()
+        return { data, error }
+    },
+
     // Users
     async createUser(userData) {
         const { data, error } = await supabase
