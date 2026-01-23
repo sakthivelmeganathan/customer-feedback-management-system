@@ -94,33 +94,54 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase configuration
-        const supabaseUrl = 'https://pccyeoeuzfqbcdkhmjqj.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjY3llb2V1emZxYmNka2htanFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTYzMjIsImV4cCI6MjA4NDM5MjMyMn0.O3RVMDDdcQlZA1W5uml0C2wzgo2ed_ECScHCLq41qzM';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        
-        window.handleUserLogin = async function(event) {
+        function handleUserLogin(event) {
             event.preventDefault();
+            console.log('Login attempt started');
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            console.log('Username:', username, 'Password length:', password.length);
             
-            // Simple test user login
             if (username === 'user1' && password === '1234@1234') {
-                localStorage.setItem('currentUser', JSON.stringify({
-                    id: 'user-test',
-                    username: 'user1',
-                    isAdmin: false
-                }));
-                window.location.href = 'dashboard.html';
-                return false;
+                console.log('Credentials match, setting localStorage');
+                try {
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: 'user-test',
+                        username: 'user1',
+                        isAdmin: false
+                    }));
+                    console.log('localStorage set, redirecting');
+                    
+                    // Try multiple redirect methods for GitHub Pages
+                    if (window.location.hostname.includes('github.io')) {
+                        window.location.replace('dashboard.html');
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } catch (e) {
+                    console.error('Error:', e);
+                    alert('Login successful! Click OK to continue.');
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                console.log('Invalid credentials');
+                document.getElementById('errorMessage').style.display = 'block';
             }
             
-            document.getElementById('errorMessage').style.display = 'block';
             return false;
         }
+        
+        // Also add click handler as backup
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const button = document.querySelector('button[type="submit"]');
+            
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleUserLogin(e);
+            });
+        });
     </script>
 </body>
 </html>
