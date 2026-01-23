@@ -254,4 +254,31 @@
         }
     </script>
 </body>
+</html>dback_' + username;
+            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+            userFeedback.push(feedbackData);
+            localStorage.setItem(userFeedbackKey, JSON.stringify(userFeedback));
+            
+            showNotification('✅ Feedback submitted successfully!');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+            
+            return false;
+        }
+        
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 2500);
+        }
+    </script>
+</body>
 </html>
