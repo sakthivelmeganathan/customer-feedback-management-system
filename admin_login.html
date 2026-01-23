@@ -97,7 +97,9 @@
         </div>
     </div>
     
-    <script>
+    <script type="module">
+        import { db } from '../supabase-config.js';
+        
         // Check URL parameters on page load
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -107,35 +109,35 @@
             if (username && password) {
                 document.getElementById('username').value = username;
                 document.getElementById('password').value = password;
-                
-                // Auto-login if credentials are provided
-                if (username === 'admin' && password === 'admin123') {
-                    window.location.href = 'admin_dashboard.html';
-                }
             }
         };
         
-        function handleLogin(event) {
+        window.handleLogin = async function(event) {
             event.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            // Check registered admin credentials
-            const adminData = localStorage.getItem('admin_' + username);
-            
-            if (adminData) {
-                const admin = JSON.parse(adminData);
-                if (admin.password === password) {
-                    window.location.href = 'admin_dashboard.html';
-                    return false;
+            try {
+                // Check Supabase shared data for admin credentials
+                const result = await db.getSharedData(`admin_${username}`);
+                
+                if (result.data && result.data.data_value) {
+                    const admin = result.data.data_value;
+                    if (admin.password === password) {
+                        window.location.href = 'admin_dashboard.html';
+                        return false;
+                    }
                 }
-            }
-            
-            // Fallback to default admin
-            if (username === 'admin' && password === 'admin123') {
-                window.location.href = 'admin_dashboard.html';
-            } else {
+                
+                // Fallback to default admin
+                if (username === 'admin' && password === 'admin123') {
+                    window.location.href = 'admin_dashboard.html';
+                } else {
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
                 document.getElementById('errorMessage').style.display = 'block';
             }
             
