@@ -69,6 +69,7 @@
         a:hover { text-decoration: underline; }
         .links { text-align: center; margin-top: 25px; }
         .links p { margin: 10px 0; color: #d1d5db; font-size: 14px; }
+        .error-message { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
     </style>
     <link rel="icon" href="data:,">
     <meta name="color-scheme" content="light dark">
@@ -83,6 +84,7 @@
             <label>Password
                 <input type="password" id="password" name="password" placeholder="Enter admin password" required>
             </label>
+            <div id="errorMessage" class="error-message">Invalid credentials</div>
             <div class="row">
                 <input type="checkbox" id="remember" name="remember">
                 <label for="remember" style="margin: 0; font-size: 13px;">Remember me</label>
@@ -119,11 +121,22 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            // Simple credential check
+            // Check registered admin credentials
+            const adminData = localStorage.getItem('admin_' + username);
+            
+            if (adminData) {
+                const admin = JSON.parse(adminData);
+                if (admin.password === password) {
+                    window.location.href = 'admin_dashboard.html';
+                    return false;
+                }
+            }
+            
+            // Fallback to default admin
             if (username === 'admin' && password === 'admin123') {
                 window.location.href = 'admin_dashboard.html';
             } else {
-                alert('Invalid credentials. Use admin/admin123');
+                document.getElementById('errorMessage').style.display = 'block';
             }
             
             return false;
