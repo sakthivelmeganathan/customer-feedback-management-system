@@ -101,23 +101,29 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            // Check if user exists in localStorage
-            const userData = localStorage.getItem('user_' + username);
-            
-            if (userData) {
-                const user = JSON.parse(userData);
-                if (user.password === password) {
-                    localStorage.setItem('currentUser', JSON.stringify({
-                        id: user.id || 'user-' + Date.now(),
-                        username: username,
-                        isAdmin: false
-                    }));
-                    window.location.href = 'dashboard.html';
-                    return false;
+            try {
+                // Check Supabase shared data for user credentials
+                const result = await db.getSharedData(`user_${username}`);
+                
+                if (result.data && result.data.data_value) {
+                    const user = result.data.data_value;
+                    if (user.password === password) {
+                        localStorage.setItem('currentUser', JSON.stringify({
+                            id: user.id || 'user-' + Date.now(),
+                            username: username,
+                            isAdmin: false
+                        }));
+                        window.location.href = 'dashboard.html';
+                        return false;
+                    }
                 }
+                
+                document.getElementById('errorMessage').style.display = 'block';
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('errorMessage').style.display = 'block';
             }
             
-            document.getElementById('errorMessage').style.display = 'block';
             return false;
         }
     </script>
