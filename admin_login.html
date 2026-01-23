@@ -97,47 +97,27 @@
         </div>
     </div>
     
-    <script type="module">
-        import { db } from '../supabase-config.js';
-        
-        // Check URL parameters on page load
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const username = urlParams.get('username');
-            const password = urlParams.get('password');
-            
-            if (username && password) {
-                document.getElementById('username').value = username;
-                document.getElementById('password').value = password;
-            }
-        };
-        
-        window.handleLogin = async function(event) {
+    <script>
+        window.handleLogin = function(event) {
             event.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            try {
-                // Check Supabase shared data for admin credentials
-                const result = await db.getSharedData(`admin_${username}`);
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: 'admin-test',
+                    username: 'admin',
+                    isAdmin: true
+                }));
                 
-                if (result.data && result.data.data_value) {
-                    const admin = result.data.data_value;
-                    if (admin.password === password) {
-                        window.location.href = 'admin_dashboard.html';
-                        return false;
-                    }
-                }
+                // Get current URL and construct dashboard path
+                const currentUrl = window.location.href;
+                const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+                const dashboardUrl = baseUrl + 'admin_dashboard.html';
                 
-                // Fallback to default admin
-                if (username === 'admin' && password === 'admin123') {
-                    window.location.href = 'admin_dashboard.html';
-                } else {
-                    document.getElementById('errorMessage').style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Login error:', error);
+                window.location.href = dashboardUrl;
+            } else {
                 document.getElementById('errorMessage').style.display = 'block';
             }
             
