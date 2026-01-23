@@ -88,8 +88,9 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from '../supabase-config.js';
+    <script>
+        // Fallback for GitHub Pages without Supabase
+        const isGitHubPages = window.location.hostname.includes('github.io');
         
         window.handleRegistration = async function(event) {
             event.preventDefault();
@@ -114,15 +115,22 @@
                     created: new Date().toISOString()
                 };
                 
-                try {
-                    // Store user in Supabase shared memory
-                    await db.setSharedData(`user_${username}`, userData);
-                    alert('Registration successful! You can now login with your credentials.');
-                    window.location.href = 'user_login.html';
-                } catch (error) {
-                    console.error('Registration error:', error);
-                    alert('Registration failed. Please try again.');
+                if (isGitHubPages) {
+                    // Use localStorage for GitHub Pages
+                    localStorage.setItem(`user_${username}`, JSON.stringify(userData));
+                } else {
+                    // Use Supabase for local development
+                    try {
+                        const { db } = await import('../supabase-config.js');
+                        await db.setSharedData(`user_${username}`, userData);
+                    } catch (error) {
+                        console.error('Supabase error, falling back to localStorage:', error);
+                        localStorage.setItem(`user_${username}`, JSON.stringify(userData));
+                    }
                 }
+                
+                alert('Registration successful! You can now login with your credentials.');
+                window.location.href = 'user_login.html';
             } else {
                 alert('Please fill in all fields');
             }
