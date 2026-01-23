@@ -171,58 +171,43 @@
         </div>
     </div>
 
-    <script>
-        // User-specific data
-        const userData = {
-            'john_doe': {
-                stats: { total: 5, resolved: 3, pending: 2, avgRating: 4.2 },
-                feedback: [
-                    { title: 'Login Issues', content: 'Having trouble logging in with 2FA...', category: 'Support', rating: 2, status: 'pending', date: 'Jan 20, 2024', response: 'No response' },
-                    { title: 'Great New Features', content: 'Love the new dashboard design...', category: 'Product', rating: 5, status: 'resolved', date: 'Jan 18, 2024', response: '💬 View' },
-                    { title: 'Mobile App Suggestion', content: 'Would be great to have offline mode...', category: 'Product', rating: 4, status: 'pending', date: 'Jan 15, 2024', response: 'No response' }
-                ]
-            },
-            'sarah_smith': {
-                stats: { total: 2, resolved: 1, pending: 1, avgRating: 3.5 },
-                feedback: [
-                    { title: 'Billing Question', content: 'Need clarification on my invoice...', category: 'Service', rating: 3, status: 'resolved', date: 'Jan 19, 2024', response: '💬 View' },
-                    { title: 'Feature Request', content: 'Please add dark mode option...', category: 'Product', rating: 4, status: 'pending', date: 'Jan 16, 2024', response: 'No response' }
-                ]
-            },
-            'mike_wilson': {
-                stats: { total: 4, resolved: 2, pending: 2, avgRating: 4.5 },
-                feedback: [
-                    { title: 'Excellent Support', content: 'Quick response from support team...', category: 'Service', rating: 5, status: 'resolved', date: 'Jan 21, 2024', response: '💬 View' },
-                    { title: 'Website Speed', content: 'Pages load faster now, great improvement...', category: 'Website', rating: 4, status: 'resolved', date: 'Jan 17, 2024', response: '💬 View' },
-                    { title: 'Documentation Update', content: 'API docs need more examples...', category: 'Product', rating: 4, status: 'pending', date: 'Jan 14, 2024', response: 'No response' }
-                ]
-            }
-        };
-
-        window.onload = function() {
+    <script type="module">
+        import { db } from '../supabase-config.js';
+        
+        window.onload = async function() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const username = currentUser.username || 'User';
             document.getElementById('username').textContent = username;
             
-            // Load user-specific feedback from localStorage
-            const userFeedbackKey = 'feedback_' + username;
-            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
-            
-            // Calculate stats from actual user feedback
-            const stats = {
-                total: userFeedback.length,
-                resolved: userFeedback.filter(f => f.status === 'resolved').length,
-                pending: userFeedback.filter(f => f.status === 'pending').length,
-                avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
-            };
-            
-            // Update stats display
-            document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = stats.total;
-            document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stats.resolved;
-            document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stats.pending;
-            document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = stats.avgRating;
-            
-            // Update feedback table with user's actual feedback
+            try {
+                // Load user-specific feedback from Supabase
+                const result = await db.getSharedData(`feedback_${username}`);
+                const userFeedback = result.data ? result.data.data_value : [];
+                
+                // Calculate stats from actual user feedback
+                const stats = {
+                    total: userFeedback.length,
+                    resolved: userFeedback.filter(f => f.status === 'resolved').length,
+                    pending: userFeedback.filter(f => f.status === 'pending').length,
+                    avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
+                };
+                
+                // Update stats display
+                document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = stats.total;
+                document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stats.resolved;
+                document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stats.pending;
+                document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = stats.avgRating;
+                
+                // Update feedback table with user's actual feedback
+                displayUserFeedback(userFeedback);
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+                // Fallback to empty state
+                displayUserFeedback([]);
+            }
+        };
+        
+        function displayUserFeedback(userFeedback) {
             const tbody = document.querySelector('.table tbody');
             tbody.innerHTML = '';
             
@@ -278,7 +263,7 @@
                     `;
                 }
             }
-        };
+        }
 
         function showFeedbackHistory() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
