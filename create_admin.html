@@ -111,8 +111,10 @@
         </div>
     </div>
     
-    <script>
-        function handleAdminCreation(event) {
+    <script type="module">
+        import { db } from '../supabase-config.js';
+        
+        window.handleAdminCreation = async function(event) {
             event.preventDefault();
             
             const username = document.querySelector('input[name="username"]').value;
@@ -127,15 +129,16 @@
                     created: new Date().toISOString()
                 };
                 
-                db.setSharedData(`admin_${username}`, adminData).then(() => {
+                try {
+                    await db.setSharedData(`admin_${username}`, adminData);
                     showNotification('✅ Admin account created successfully!');
                     setTimeout(() => {
                         window.location.href = 'admin_login.html';
                     }, 2000);
-                }).catch(error => {
+                } catch (error) {
                     console.error('Error creating admin:', error);
                     showNotification('❌ Failed to create admin account!', 'error');
-                });
+                }
             } else {
                 showNotification('❌ Invalid registration code!', 'error');
             }
