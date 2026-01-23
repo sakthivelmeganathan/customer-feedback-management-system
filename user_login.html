@@ -94,7 +94,9 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { db } from '../supabase-config.js';
+        
         window.handleUserLogin = async function(event) {
             event.preventDefault();
             
