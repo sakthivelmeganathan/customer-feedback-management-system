@@ -148,7 +148,9 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { db } from '../supabase-config.js';
+        
         let selectedRating = 0;
 
         // Star rating functionality
@@ -189,7 +191,7 @@
             document.getElementById('ratingText').textContent = texts[selectedRating] || 'Click to rate';
         }
 
-        function submitFeedback(event) {
+        window.submitFeedback = async function(event) {
             event.preventDefault();
             
             const title = document.getElementById('title').value;
@@ -205,37 +207,39 @@
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const username = currentUser.username || 'User';
             
-            const feedback = {
-                id: Date.now(),
+            const feedbackData = {
                 title: title,
                 category: category,
                 rating: parseInt(rating),
                 content: content,
                 status: 'pending',
-                date: new Date().toLocaleDateString('en-US', { 
+                user: username
+            };
+            
+            try {
+                // Store in Supabase shared data
+                const allFeedback = await db.getSharedData('allFeedback');
+                const feedbackList = allFeedback.data ? allFeedback.data.data_value : [];
+                
+                feedbackData.id = Date.now();
+                feedbackData.date = new Date().toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'short', 
                     day: 'numeric' 
-                }),
-                user: username,
-                response: 'No response'
-            };
-            
-            // Store user-specific feedback
-            const userFeedbackKey = 'feedback_' + username;
-            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
-            userFeedback.push(feedback);
-            localStorage.setItem(userFeedbackKey, JSON.stringify(userFeedback));
-            
-            // Store in global feedback for admin dashboard
-            const allFeedback = JSON.parse(localStorage.getItem('allFeedback') || '[]');
-            allFeedback.push(feedback);
-            localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
-            
-            showNotification('✅ Feedback submitted successfully!');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 2000);
+                });
+                feedbackData.response = 'No response';
+                
+                feedbackList.push(feedbackData);
+                await db.setSharedData('allFeedback', feedbackList);
+                
+                showNotification('✅ Feedback submitted successfully!');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to submit feedback. Please try again.');
+            }
             
             return false;
         }
