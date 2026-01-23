@@ -87,6 +87,7 @@
                 <label for="remember">Remember me</label>
             </div>
             <button type="submit">Sign In</button>
+            <button type="button" onclick="directLogin()" style="margin-top: 10px; background: #10b981;">🚀 Direct Login (GitHub Test)</button>
         </form>
         <div class="links">
             <p>No account? <a href="register.html">Create one here</a></p>
@@ -95,6 +96,24 @@
     </div>
 
     <script>
+        function directLogin() {
+            console.log('Direct login clicked');
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: 'user-test',
+                username: 'user1',
+                isAdmin: false
+            }));
+            console.log('Direct login - localStorage set');
+            
+            // Get current URL and construct dashboard path
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+            const dashboardUrl = baseUrl + 'dashboard.html';
+            
+            console.log('Redirecting to:', dashboardUrl);
+            window.location.href = dashboardUrl;
+        }
+        
         function handleUserLogin(event) {
             event.preventDefault();
             console.log('Login attempt started');
@@ -113,12 +132,13 @@
                     }));
                     console.log('localStorage set, redirecting');
                     
-                    // Try multiple redirect methods for GitHub Pages
-                    if (window.location.hostname.includes('github.io')) {
-                        window.location.replace('dashboard.html');
-                    } else {
-                        window.location.href = 'dashboard.html';
-                    }
+                    // Get current URL and construct dashboard path
+                    const currentUrl = window.location.href;
+                    const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+                    const dashboardUrl = baseUrl + 'dashboard.html';
+                    
+                    console.log('Redirecting to:', dashboardUrl);
+                    window.location.href = dashboardUrl;
                 } catch (e) {
                     console.error('Error:', e);
                     alert('Login successful! Click OK to continue.');
