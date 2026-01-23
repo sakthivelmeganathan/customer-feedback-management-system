@@ -108,7 +108,7 @@
             const password = document.getElementById('password').value;
             
             try {
-                // Check Supabase global shared data only
+                // Check Supabase global shared data
                 const { data, error } = await supabase
                     .from('shared_data')
                     .select('data_value')
@@ -125,9 +125,30 @@
                     return false;
                 }
                 
+                // Test user fallback
+                if (username === 'user1' && password === '1234@1234') {
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: 'user-test',
+                        username: 'user1',
+                        isAdmin: false
+                    }));
+                    window.location.href = 'dashboard.html';
+                    return false;
+                }
+                
                 document.getElementById('errorMessage').style.display = 'block';
             } catch (error) {
                 console.error('Login error:', error);
+                // Test user fallback for GitHub Pages
+                if (username === 'user1' && password === '1234@1234') {
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: 'user-test',
+                        username: 'user1',
+                        isAdmin: false
+                    }));
+                    window.location.href = 'dashboard.html';
+                    return false;
+                }
                 document.getElementById('errorMessage').style.display = 'block';
             }
             
