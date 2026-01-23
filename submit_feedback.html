@@ -208,29 +208,37 @@
             const username = currentUser.username || 'User';
             
             const feedbackData = {
+                id: Date.now(),
                 title: title,
                 category: category,
                 rating: parseInt(rating),
                 content: content,
                 status: 'pending',
-                user: username
-            };
-            
-            try {
-                // Store in Supabase shared data
-                const allFeedback = await db.getSharedData('allFeedback');
-                const feedbackList = allFeedback.data ? allFeedback.data.data_value : [];
-                
-                feedbackData.id = Date.now();
-                feedbackData.date = new Date().toLocaleDateString('en-US', { 
+                user: username,
+                date: new Date().toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'short', 
                     day: 'numeric' 
-                });
-                feedbackData.response = 'No response';
+                }),
+                response: 'No response'
+            };
+            
+            try {
+                // Get existing feedback from Supabase
+                const result = await db.getSharedData('allFeedback');
+                const feedbackList = result.data ? result.data.data_value : [];
                 
+                // Add new feedback
                 feedbackList.push(feedbackData);
+                
+                // Store back to Supabase
                 await db.setSharedData('allFeedback', feedbackList);
+                
+                // Also store user-specific feedback
+                const userResult = await db.getSharedData(`feedback_${username}`);
+                const userFeedback = userResult.data ? userResult.data.data_value : [];
+                userFeedback.push(feedbackData);
+                await db.setSharedData(`feedback_${username}`, userFeedback);
                 
                 showNotification('✅ Feedback submitted successfully!');
                 setTimeout(() => {
