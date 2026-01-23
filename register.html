@@ -117,16 +117,18 @@
                 };
                 
                 try {
-                    // Store user in Supabase shared memory
-                    await supabase
+                    // Store user in Supabase global shared memory
+                    const { error } = await supabase
                         .from('shared_data')
                         .upsert([{ data_key: `user_${username}`, data_value: userData }]);
                     
-                    alert('Registration successful! You can now login with your credentials.');
+                    if (error) throw error;
+                    
+                    alert('Registration successful! You can now login globally from any device.');
                     window.location.href = 'user_login.html';
                 } catch (error) {
-                    console.error('Registration error:', error);
-                    alert('Registration failed. Please try again.');
+                    console.error('Registration failed:', error);
+                    alert('Registration failed. Please ensure Supabase is set up correctly.');
                 }
             } else {
                 alert('Please fill in all fields');
