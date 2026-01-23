@@ -14,7 +14,7 @@
             display: flex;
             flex-direction: column;
         }
-        .header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: #fff; padding: 15px 20px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .header { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: #fff; padding: 8px 20px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .form-card { 
             width: 100%; 
@@ -81,13 +81,29 @@
             width: 100%;
         }
         .back-link:hover { text-decoration: underline; }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
     </style>
     <link rel="icon" href="data:,">
 </head>
 <body>
     <div class="header">
-        <h1>📝 Submit Your Feedback</h1>
-        <p style="margin: 5px 0; opacity: 0.9;">Help us improve by sharing your experience</p>
+        <h1 style="margin: 0; font-size: 20px;">📝 Submit Your Feedback</h1>
+        <p style="margin: 2px 0; opacity: 0.9; font-size: 12px;">Help us improve by sharing your experience</p>
     </div>
 
     <div class="container">
@@ -186,8 +202,9 @@
                 return false;
             }
             
-            // Store feedback for specific user
-            const username = localStorage.getItem('currentUser') || 'User';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const username = currentUser.username || 'User';
+            
             const feedback = {
                 id: Date.now(),
                 title: title,
@@ -215,27 +232,25 @@
             allFeedback.push(feedback);
             localStorage.setItem('allFeedback', JSON.stringify(allFeedback));
             
-            alert('Thank you! Your feedback has been submitted successfully.');
-            // Update user dashboard data
-            updateUserDashboard(username);
-            window.location.href = 'dashboard.html';
+            showNotification('✅ Feedback submitted successfully!');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
             
             return false;
         }
         
-        function updateUserDashboard(username) {
-            // Update user's dashboard statistics
-            const userFeedbackKey = 'feedback_' + username;
-            const userFeedback = JSON.parse(localStorage.getItem(userFeedbackKey) || '[]');
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
             
-            const stats = {
-                total: userFeedback.length,
-                resolved: userFeedback.filter(f => f.status === 'resolved').length,
-                pending: userFeedback.filter(f => f.status === 'pending').length,
-                avgRating: userFeedback.length > 0 ? (userFeedback.reduce((sum, f) => sum + f.rating, 0) / userFeedback.length).toFixed(1) : 0
-            };
-            
-            localStorage.setItem('stats_' + username, JSON.stringify(stats));
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 2500);
         }
     </script>
 </body>
