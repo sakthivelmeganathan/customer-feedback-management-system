@@ -108,24 +108,21 @@
             const password = document.getElementById('password').value;
             
             try {
-                // Check Supabase shared data for user credentials
+                // Check Supabase global shared data only
                 const { data, error } = await supabase
                     .from('shared_data')
                     .select('data_value')
                     .eq('data_key', `user_${username}`)
                     .single();
                 
-                if (data && data.data_value) {
-                    const userData = data.data_value;
-                    if (userData.password === password) {
-                        localStorage.setItem('currentUser', JSON.stringify({
-                            id: userData.id || 'user-' + Date.now(),
-                            username: username,
-                            isAdmin: false
-                        }));
-                        window.location.href = 'dashboard.html';
-                        return false;
-                    }
+                if (data && data.data_value && data.data_value.password === password) {
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: data.data_value.id,
+                        username: username,
+                        isAdmin: false
+                    }));
+                    window.location.href = 'dashboard.html';
+                    return false;
                 }
                 
                 document.getElementById('errorMessage').style.display = 'block';
