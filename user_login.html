@@ -94,8 +94,8 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from '../supabase-config.js';
+    <script>
+        const isGitHubPages = window.location.hostname.includes('github.io');
         
         window.handleUserLogin = async function(event) {
             event.preventDefault();
@@ -104,20 +104,39 @@
             const password = document.getElementById('password').value;
             
             try {
-                // Check Supabase shared data for user credentials
-                const result = await db.getSharedData(`user_${username}`);
+                let userData = null;
                 
-                if (result.data && result.data.data_value) {
-                    const user = result.data.data_value;
-                    if (user.password === password) {
-                        localStorage.setItem('currentUser', JSON.stringify({
-                            id: user.id || 'user-' + Date.now(),
-                            username: username,
-                            isAdmin: false
-                        }));
-                        window.location.href = 'dashboard.html';
-                        return false;
+                if (isGitHubPages) {
+                    // Use localStorage for GitHub Pages
+                    const stored = localStorage.getItem(`user_${username}`);
+                    if (stored) {
+                        userData = JSON.parse(stored);
                     }
+                } else {
+                    // Use Supabase for local development
+                    try {
+                        const { db } = await import('../supabase-config.js');
+                        const result = await db.getSharedData(`user_${username}`);
+                        if (result.data && result.data.data_value) {
+                            userData = result.data.data_value;
+                        }
+                    } catch (error) {
+                        console.error('Supabase error, falling back to localStorage:', error);
+                        const stored = localStorage.getItem(`user_${username}`);
+                        if (stored) {
+                            userData = JSON.parse(stored);
+                        }
+                    }
+                }
+                
+                if (userData && userData.password === password) {
+                    localStorage.setItem('currentUser', JSON.stringify({
+                        id: userData.id || 'user-' + Date.now(),
+                        username: username,
+                        isAdmin: false
+                    }));
+                    window.location.href = 'dashboard.html';
+                    return false;
                 }
                 
                 document.getElementById('errorMessage').style.display = 'block';
