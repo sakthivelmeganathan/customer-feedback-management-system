@@ -68,6 +68,22 @@
         .links { text-align: center; margin-top: 25px; }
         .links p { margin: 10px 0; color: #d1d5db; font-size: 14px; }
         .info { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: #60a5fa; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; text-align: center; }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
     </style>
     <link rel="icon" href="data:,">
 </head>
@@ -77,12 +93,15 @@
         <div class="info">
             This will create a default admin account with username: <strong>admin</strong> and password: <strong>admin123</strong>
         </div>
-        <form>
+        <form onsubmit="return handleAdminCreation(event)">
             <label>Admin Username
                 <input type="text" name="username" value="admin" placeholder="Enter admin username" required>
             </label>
             <label>Admin Password
                 <input type="password" name="password" value="admin123" placeholder="Enter admin password" required>
+            </label>
+            <label>Admin Registration Code
+                <input type="text" name="regcode" placeholder="Enter registration code" required>
             </label>
             <button type="submit">🔐 Create Admin Account</button>
         </form>
@@ -91,5 +110,48 @@
             <p><a href="index.html">Back to Home</a></p>
         </div>
     </div>
+    
+    <script>
+        function handleAdminCreation(event) {
+            event.preventDefault();
+            
+            const username = document.querySelector('input[name="username"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+            const regcode = document.querySelector('input[name="regcode"]').value;
+            
+            if (regcode === 'ADMIN2024') {
+                // Store admin credentials
+                const adminData = {
+                    username: username,
+                    password: password,
+                    created: new Date().toISOString()
+                };
+                localStorage.setItem('admin_' + username, JSON.stringify(adminData));
+                
+                showNotification('✅ Admin account created successfully!');
+                setTimeout(() => {
+                    window.location.href = 'admin_login.html';
+                }, 2000);
+            } else {
+                showNotification('❌ Invalid registration code!', 'error');
+            }
+            
+            return false;
+        }
+        
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            if (type === 'error') notification.style.background = '#ef4444';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 2500);
+        }
+    </script>
 </body>
 </html>
