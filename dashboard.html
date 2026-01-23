@@ -171,8 +171,12 @@
         </div>
     </div>
 
-    <script type="module">
-        import { db } from '../supabase-config.js';
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase configuration
+        const supabaseUrl = 'https://pccyeoeuzfqbcdkhmjqj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjY3llb2V1emZxYmNka2htanFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MTYzMjIsImV4cCI6MjA4NDM5MjMyMn0.O3RVMDDdcQlZA1W5uml0C2wzgo2ed_ECScHCLq41qzM';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         
         window.onload = async function() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -181,8 +185,13 @@
             
             try {
                 // Load user-specific feedback from Supabase
-                const result = await db.getSharedData(`feedback_${username}`);
-                const userFeedback = result.data ? result.data.data_value : [];
+                const { data, error } = await supabase
+                    .from('shared_data')
+                    .select('data_value')
+                    .eq('data_key', `feedback_${username}`)
+                    .single();
+                
+                const userFeedback = data && data.data_value ? data.data_value : [];
                 
                 // Calculate stats from actual user feedback
                 const stats = {
