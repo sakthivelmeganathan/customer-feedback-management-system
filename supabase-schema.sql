@@ -1,5 +1,21 @@
 -- Run this in your Supabase SQL Editor
 
+-- Admins table
+CREATE TABLE admins (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Shared memory table for cross-session data
+CREATE TABLE shared_data (
+    id SERIAL PRIMARY KEY,
+    data_key VARCHAR(100) UNIQUE NOT NULL,
+    data_value JSONB NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Users table
 CREATE TABLE users (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -54,3 +70,7 @@ CREATE POLICY "Admins can view all feedback" ON feedback
 -- Insert default admin user
 INSERT INTO users (username, password, email, is_admin) 
 VALUES ('admin', 'admin123', 'admin@example.com', TRUE);
+
+-- Insert default admin in admins table
+INSERT INTO admins (username, password) 
+VALUES ('admin', 'admin123');
